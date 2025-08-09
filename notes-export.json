@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2025-08-09T23:41:30.884Z",
+  "exportedAt": "2025-08-09T23:49:58.923Z",
   "expanded": [
     "ec59d588-d18a-4e04-a911-16cf7e039e24"
   ],
@@ -11,7 +11,7 @@
       "parentId": "ec59d588-d18a-4e04-a911-16cf7e039e24",
       "title": "asf",
       "order": 1754776149619,
-      "contentHtml": "asd sad<div><br></div>"
+      "contentHtml": "<span><mjx-container class=\"MathJax CtxtMenu_Attached_0\" jax=\"CHTML\" tabindex=\"0\" ctxtmenu_counter=\"0\" style=\"font-size: 113.1%; position: relative;\"><mjx-math class=\"MJX-TEX\" aria-hidden=\"true\"><mjx-mi class=\"mjx-i\"><mjx-c class=\"mjx-c1D44E TEX-I\"></mjx-c></mjx-mi></mjx-math><mjx-assistive-mml unselectable=\"on\" display=\"inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>a</mi></math></mjx-assistive-mml></mjx-container></span> asd sad<div><br></div>"
     },
     {
       "id": "cd867257-779a-4a3c-9e2a-5a583f5ff66f",
@@ -32,7 +32,7 @@
       "id": "home",
       "type": "home",
       "title": "Home",
-      "contentHtml": "<h1>Welcome</h1>\n<p>This is your docs-style notes space. Use the green sidebar to add sections and pages. Everything is saved locally in your browser (IndexedDB), perfect for GitHub Pages — no backend needed.</p>\n<p>Examples:</p>\n<ul>\n  <li>Create a <strong>Section</strong> like <em>Linear Models</em>.</li>\n  <li>Add Pages under it, like <em>Linear Regression</em>, <em>Ridge</em>, <em>Lasso</em>.</li>\n  <li>Type math like <code>$$ y = X\\beta + \\epsilon $$</code> and it will render.</li>\n  <li>Drag and drop images into the editor, or use the Image button.</li></ul>"
+      "contentHtml": "<h1>Welcome</h1>\n<p>This is your docs-style notes space. Use the green sidebar to add sections and pages. Everything is saved locally in your browser (IndexedDB), perfect for GitHub Pages — no backend needed.</p>\n<p>Examples:</p>\n<ul>\n  <li>Create a <strong>Section</strong> like <em>Linear Models</em>.asd&nbsp;</li>\n  <li>Add Pages under it, like <em>Linear Regression</em>, <em>Ridge</em>, <em>Lasso</em>.</li>\n  <li>Type math like <code>$$ y = X\\beta + \\epsilon $$</code> and it will render.</li>\n  <li>Drag and drop images into the editor, or use the Image button.</li></ul>"
     }
   ]
 }
