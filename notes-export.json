@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "exportedAt": "2025-08-09T22:23:23.182Z",
+  "expanded": [
+    "ec59d588-d18a-4e04-a911-16cf7e039e24"
+  ],
+  "nodes": [
+    {
+      "id": "b55b8c2e-134f-4cb4-91b9-41fb027795ab",
+      "type": "page",
+      "parentId": "ec59d588-d18a-4e04-a911-16cf7e039e24",
+      "title": "asf",
+      "order": 1754776149619,
+      "contentHtml": "asd sad"
+    },
+    {
+      "id": "cd867257-779a-4a3c-9e2a-5a583f5ff66f",
+      "type": "page",
+      "parentId": "ec59d588-d18a-4e04-a911-16cf7e039e24",
+      "title": "ssss",
+      "order": 1754778164770,
+      "contentHtml": "hello there<p></p>"
+    },
+    {
+      "id": "ec59d588-d18a-4e04-a911-16cf7e039e24",
+      "type": "section",
+      "title": "afsf",
+      "order": 1754776144790,
+      "contentHtml": "<br><p></p><p></p>"
+    },
+    {
+      "id": "home",
+      "type": "home",
+      "title": "Home",
+      "contentHtml": "<h1>Welcome</h1>\n<p>This is your docs-style notes space. Use the green sidebar to add sections and pages. Everything is saved locally in your browser (IndexedDB), perfect for GitHub Pages — no backend needed.</p>\n<p>Examples:</p>\n<ul>\n  <li>Create a <strong>Section</strong> like <em>Linear Models</em>.</li>\n  <li>Add Pages under it, like <em>Linear Regression</em>, <em>Ridge</em>, <em>Lasso</em>.</li>\n  <li>Type math like <code>$$ y = X\\beta + \\epsilon $$</code> and it will render.</li>\n  <li>Drag and drop images into the editor, or use the Image button.</li></ul>"
+    }
+  ]
+}
