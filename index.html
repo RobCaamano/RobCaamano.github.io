@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Study Notes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- KaTeX (for LaTeX formulas in Quill) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+
+  <!-- Quill editor -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css">
+  <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
+
+  <!-- Fuse.js (fuzzy search) -->
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
+
+  <!-- idb-keyval (tiny IndexedDB wrapper) -->
+  <script src="https://cdn.jsdelivr.net/npm/idb-keyval@6/dist/idb-keyval-iife.min.js"></script>
+
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="site-title" id="siteTitle" contenteditable="true" spellcheck="false">Study Notes</div>
+        <input id="searchInput" class="search" placeholder="Search…" aria-label="Search notes" />
+      </div>
+
+      <div class="sidebar-actions">
+        <button id="addSectionBtn" title="Add Section">+ Section</button>
+        <button id="addNoteBtn" title="Add Note">+ Note</button>
+        <button id="exportBtn" title="Export all data">Export</button>
+        <button id="importBtn" title="Import data">Import</button>
+        <button id="syncBtn" title="Sync with GitHub">Sync</button>
+      </div>
+
+      <nav id="nav">
+        <!-- Sections + notes get rendered here -->
+      </nav>
+
+      <div id="searchResults" class="search-results" hidden></div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main">
+      <header class="topbar">
+        <div class="breadcrumbs" id="breadcrumbs">Home</div>
+        <div class="topbar-actions">
+          <button id="homeBtn">Home</button>
+          <button id="renameBtn">Rename</button>
+          <button id="deleteBtn" class="danger">Delete</button>
+          <button id="editBtn">Edit</button>
+          <button id="saveBtn" class="primary" hidden>Save</button>
+        </div>
+      </header>
+
+      <!-- Viewer (read mode) -->
+      <article id="viewer" class="viewer" tabindex="0"></article>
+
+      <!-- Editor (edit mode) -->
+      <div id="editorWrap" class="editor-wrap" hidden>
+        <div id="toolbar">
+          <span class="ql-formats">
+            <select class="ql-header">
+              <option value="1"></option>
+              <option value="2"></option>
+              <option selected></option>
+            </select>
+            <select class="ql-size"></select>
+          </span>
+          <span class="ql-formats">
+            <button class="ql-bold"></button>
+            <button class="ql-italic"></button>
+            <button class="ql-underline"></button>
+            <button class="ql-strike"></button>
+            <select class="ql-color"></select>
+            <select class="ql-background"></select>
+          </span>
+          <span class="ql-formats">
+            <button class="ql-blockquote"></button>
+            <button class="ql-code-block"></button>
+          </span>
+          <span class="ql-formats">
+            <button class="ql-list" value="ordered"></button>
+            <button class="ql-list" value="bullet"></button>
+            <button class="ql-indent" value="-1"></button>
+            <button class="ql-indent" value="+1"></button>
+          </span>
+          <span class="ql-formats">
+            <button class="ql-link"></button>
+            <button class="ql-image"></button>
+            <button class="ql-formula"></button>
+          </span>
+          <span class="ql-formats">
+            <button class="ql-clean"></button>
+          </span>
+        </div>
+        <div id="editor" class="editor" aria-label="Note editor"></div>
+        <div class="hint">Tip: Drag & drop images into the editor. Press <kbd>Ctrl/⌘</kbd>+<kbd>S</kbd> to save.</div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Import dialog (hidden file input) -->
+  <input type="file" id="importFile" accept="application/json" hidden />
+
+  <!-- Sync modal -->
+  <dialog id="syncDialog">
+    <form method="dialog" class="sync-form">
+      <h3>GitHub Sync (optional)</h3>
+      <label>Owner <input id="ghOwner" placeholder="your-user-or-org"></label>
+      <label>Repo <input id="ghRepo" placeholder="your-repo"></label>
+      <label>Branch <input id="ghBranch" value="gh-pages"></label>
+      <label>Path <input id="ghPath" value="data/notes.json"></label>
+      <label>Token
+        <input id="ghToken" placeholder="Personal Access Token (repo scope)">
+      </label>
+      <div class="row">
+        <button id="loadFromGitHub" type="button">Load from GitHub</button>
+        <button id="saveToGitHub" type="button" class="primary">Save to GitHub</button>
+        <button type="submit">Close</button>
+      </div>
+      <p class="small">
+        Your token is stored only in this browser (local storage). Consider using a fine-scoped token.
+      </p>
+      <div id="syncStatus" class="status"></div>
+    </form>
+  </dialog>
+
+  <script src="./app.js"></script>
+</body>
+</html>
