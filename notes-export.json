@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2025-08-09T22:23:40.533Z",
+  "exportedAt": "2025-08-09T22:24:49.845Z",
   "expanded": [
     "ec59d588-d18a-4e04-a911-16cf7e039e24"
   ],
@@ -32,7 +32,7 @@
       "id": "home",
       "type": "home",
       "title": "Home",
-      "contentHtml": "<h1>Welcome</h1>\n<p>This is your docs-style notes space. Use the green sidebar to add sections and pages. Everything is saved locally in your browser (IndexedDB), perfect for GitHub Pages — no backend needed.</p>\n<p>Examples:</p>\n<ul>\n  <li>Create a <strong>Section</strong> like <em>Linear Models</em>.</li>\n  <li>Add Pages under it, like <em>Linear Regression</em>, <em>Ridge</em>, <em>Lasso</em>.</li>\n  <li>Type math like <code>$$ y = X\\beta + \\epsilon $$</code> and it will render.</li>\n  <li>Drag and drop images into the editor, or use the Image button.</li></ul>"
+      "contentHtml": "<h1>Welcome</h1>\n<p>This is your docs-style notes space. Use the green sidebar to add sections and pages. Everything is saved locally in your browser (IndexedDB), perfect for GitHub Pages — no backend needed.</p>\n<p>Examples:</p>\n<ul>\n  <li>Create a <strong>Section</strong> like <em>Linear Models</em>.</li>\n  <li>Add Pages under it, like <em>Linear Regression</em>, <em>Ridge</em>, <em>Lasso</em>.</li>\n  <li>Type math like <code>$$ y = X\\beta + \\epsilon $$</code> and it will render.</li>\n  <li>Drag and drop images into the editor, or use the Image button.asd</li></ul>"
     }
   ]
 }
