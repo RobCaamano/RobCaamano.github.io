@@ -7,23 +7,19 @@
   <style>
     :root{
       --sidebar-bg: #1b5e20; /* deep green */
-      --sidebar-accent: #2e7d32;
       --sidebar-text: #e8f5e9;
       --sidebar-text-dim: #c8e6c9;
       --bg: #ffffff;
       --text: #111;
-      --muted: #6b7280;
       --border: #e5e7eb;
-      --focus: #2563eb;
-      --danger: #b91c1c;
       --toolbar-bg: #f8fafc;
-      --disabled: #9ca3af33;
+      --danger: #b91c1c;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,"Helvetica Neue",Arial,"Apple Color Emoji","Segoe UI Emoji";
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,"Helvetica Neue",Arial;
       color:var(--text);
       background:var(--bg);
     }
@@ -48,82 +44,49 @@
       background:#fff;
     }
     header .left{display:flex; align-items:center; gap:12px}
-    header h1{
-      font-size:16px;
-      margin:0;
-      font-weight:600;
-    }
+    header h1{font-size:16px;margin:0;font-weight:600}
     header .actions{display:flex; gap:8px; align-items:center}
     header .actions .btn{
       border:1px solid var(--border);
-      background:#fff;
-      color:#111;
-      padding:6px 10px;
-      border-radius:6px;
-      font-size:12px;
-      cursor:pointer;
+      background:#fff; color:#111;
+      padding:6px 10px; border-radius:6px; font-size:12px; cursor:pointer;
     }
     header .actions .btn[disabled]{opacity:.5; cursor:not-allowed}
     header .actions .btn:hover{background:#f3f4f6}
+
     aside{
       grid-area: sidebar;
       background:var(--sidebar-bg);
       color:var(--sidebar-text);
-      display:flex;
-      flex-direction:column;
+      display:flex; flex-direction:column;
       border-right:1px solid rgba(255,255,255,0.08);
       overflow:hidden;
     }
-    .sidebar-top{
-      padding:12px;
-      border-bottom:1px solid rgba(255,255,255,0.1);
-    }
-    .search{
-      position:relative;
-    }
+    .sidebar-top{padding:12px; border-bottom:1px solid rgba(255,255,255,0.1)}
+    .search{position:relative}
     .search input{
-      width:100%;
-      padding:10px 10px 10px 32px;
-      border-radius:8px;
-      border:1px solid rgba(255,255,255,0.2);
-      background:rgba(255,255,255,0.08);
-      color:#fff;
-      outline:none;
+      width:100%; padding:10px 10px 10px 32px;
+      border-radius:8px; border:1px solid rgba(255,255,255,0.2);
+      background:rgba(255,255,255,0.08); color:#fff; outline:none;
     }
     .search input::placeholder{color:var(--sidebar-text-dim)}
-    .search svg{
-      position:absolute; left:8px; top:50%; transform:translateY(-50%);
-      width:16px;height:16px; opacity:.8;
-    }
-    .sidebar-actions{
-      display:flex; gap:8px; margin-top:10px;
-    }
+    .search svg{position:absolute; left:8px; top:50%; transform:translateY(-50%); width:16px;height:16px; opacity:.8}
+    .sidebar-actions{display:flex; gap:8px; margin-top:10px}
     .btn{
-      appearance:none;
-      border:1px solid rgba(255,255,255,0.2);
-      background:rgba(255,255,255,0.06);
-      color:#fff;
-      padding:8px 10px;
-      border-radius:6px;
-      font-size:12px;
-      cursor:pointer;
+      appearance:none; border:1px solid rgba(255,255,255,0.2);
+      background:rgba(255,255,255,0.06); color:#fff;
+      padding:8px 10px; border-radius:6px; font-size:12px; cursor:pointer;
     }
     .btn:hover{background:rgba(255,255,255,0.12)}
     .btn[disabled]{opacity:.5; cursor:not-allowed}
-    .tree{
-      padding:8px 0;
-      overflow:auto;
-      flex:1;
-    }
+    .tree{padding:8px 0; overflow:auto; flex:1}
     .tree .home, .tree .node{
-      display:flex; align-items:center; gap:8px;
-      padding:6px 12px; cursor:pointer; user-select:none;
-      color:var(--sidebar-text);
+      display:flex; align-items:center; gap:8px; padding:6px 12px;
+      cursor:pointer; user-select:none; color:var(--sidebar-text);
     }
     .tree .home:hover, .tree .node:hover{background:rgba(255,255,255,0.08)}
     .tree .node.selected, .tree .home.selected{background:rgba(255,255,255,0.15)}
     .label{flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-    .dim{color:var(--sidebar-text-dim)}
     .twisty{width:14px;height:14px; display:inline-flex; align-items:center; justify-content:center}
     .children{margin-left:16px;}
     .node .actions{display:none; gap:6px}
@@ -132,106 +95,68 @@
       background:none; border:none; padding:2px; cursor:pointer; color:var(--sidebar-text-dim);
     }
     .tree button.icon:hover{color:#fff}
-    main{
-      grid-area: main;
-      display:flex;
-      flex-direction:column;
-      overflow:hidden;
-    }
+
+    main{grid-area: main; display:flex; flex-direction:column; overflow:hidden}
     .toolbar{
-      background:var(--toolbar-bg);
-      border-bottom:1px solid var(--border);
-      padding:8px;
-      display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+      background:var(--toolbar-bg); border-bottom:1px solid var(--border);
+      padding:8px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;
     }
     .toolbar.disabled{pointer-events:none; opacity:.5}
     .toolbar .tool-btn, .toolbar select, .toolbar input[type="color"]{
-      appearance:none;
-      border:1px solid var(--border);
-      background:#fff;
-      padding:8px 10px;
-      border-radius:6px;
-      font-size:13px;
-      cursor:pointer;
+      appearance:none; border:1px solid var(--border); background:#fff;
+      padding:8px 10px; border-radius:6px; font-size:13px; cursor:pointer;
     }
     .tool-btn:hover{background:#f3f4f6}
     .tool-sep{width:1px; height:28px; background:var(--border); margin:0 2px}
-    .editor-wrap{
-      position:relative;
-      overflow:auto;
-      flex:1;
-      padding:16px;
-    }
-    .titlebar{
-      display:flex; gap:12px; align-items:center; margin:0 0 8px 0;
-    }
+    .editor-wrap{position:relative; overflow:auto; flex:1; padding:16px}
+    .titlebar{display:flex; gap:12px; align-items:center; margin:0 0 8px 0}
     .titlebar input{
       font-size:20px; font-weight:600; border:1px solid var(--border);
       border-radius:8px; padding:8px 10px; flex:1;
     }
     #editor{
-      min-height:60vh;
-      outline:none;
-      border:1px solid var(--border);
-      border-radius:8px;
-      padding:16px;
-      line-height:1.6;
-      scroll-behavior:smooth;
+      min-height:60vh; outline:none; border:1px solid var(--border);
+      border-radius:8px; padding:16px; line-height:1.6; scroll-behavior:smooth;
     }
     #editor[contenteditable="false"]{background:#fafafa}
     #editor img{max-width:100%; height:auto; display:block; margin:8px 0}
-    .placeholder{color:#9ca3af}
-    .empty-hint{
-      padding:24px; color:#374151;
-    }
+    .empty-hint{padding:24px; color:#374151; display:none}
+
     .status{
       position:fixed; bottom:12px; right:12px; background:#111827; color:#e5e7eb;
       padding:8px 12px; border-radius:999px; font-size:12px; opacity:0; transition:.2s; z-index:2000;
     }
     .status.show{opacity:1}
+
     /* Modal */
     .modal-backdrop{
-      position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:1500;
+      position:fixed; inset:0; background:rgba(0,0,0,.35);
+      display:none; align-items:center; justify-content:center; z-index:1500;
     }
     .modal{
       background:#fff; border-radius:12px; width:min(760px, calc(100% - 24px));
-      border:1px solid var(--border);
-      box-shadow: 0 20px 40px rgba(0,0,0,.15);
-      overflow:hidden;
-      max-height:80vh; display:flex; flex-direction:column;
+      border:1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,.15);
+      overflow:hidden; max-height:80vh; display:flex; flex-direction:column;
     }
-    .modal header{
-      border-bottom:1px solid var(--border); padding:12px 16px; display:flex; align-items:center; justify-content:space-between;
-    }
+    .modal header{border-bottom:1px solid var(--border); padding:12px 16px; display:flex; align-items:center; justify-content:space-between}
     .modal .body{padding:16px; overflow:auto}
     .modal footer{padding:12px 16px; border-top:1px solid var(--border); display:flex; gap:8px; justify-content:flex-end}
-    .modal textarea, .modal input[type="text"], .modal input[type="url"], .modal select, .modal input[type="password"]{
+    .modal textarea,.modal input[type="text"],.modal input[type="url"],.modal select,.modal input[type="password"]{
       width:100%; padding:10px; border-radius:8px; border:1px solid var(--border); font-family:inherit; font-size:14px;
     }
-    .btn-ghost{background:#fff; color:#111; border:1px solid var(--border)}
-    .btn-primary{background:#111827; color:#fff; border:1px solid #111827}
-    .danger{color:#fff; background:var(--danger); border-color:var(--danger)}
-    /* Search results styling */
-    .result{padding:10px 0; border-bottom:1px solid var(--border)}
-    .result .where{font-size:12px; color:#6b7280}
-    .result .snippet{font-size:14px; margin-top:6px}
-    mark{background:#fff59d}
+
     /* Responsive */
-    @media (max-width: 880px){
-      .app{grid-template-columns: 220px 1fr;}
-    }
+    @media (max-width: 880px){ .app{grid-template-columns: 220px 1fr;} }
     @media (max-width: 720px){
       .app{
         grid-template-columns: 1fr;
         grid-template-rows: 56px auto 1fr;
-        grid-template-areas:
-          "header"
-          "sidebar"
-          "main";
+        grid-template-areas: "header" "sidebar" "main";
       }
       aside{max-height:320px}
     }
   </style>
+
   <!-- MathJax for LaTeX -->
   <script>
     window.MathJax = {
@@ -242,8 +167,7 @@
       svg: { fontCache: 'global' }
     };
   </script>
-  <script id="MathJax-script" async
-          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </head>
 <body>
 <div class="app">
@@ -251,16 +175,14 @@
     <div class="sidebar-top">
       <div class="search">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27a6.471 6.471 0 001.48-5.34C15.19 5.01 12.17 2 8.59 2S2 5.01 2 8.39c0 3.39 3.02 6.39 6.59 6.39 1.61 0 3.09-.59 4.22-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6.91 0C5.51 14 3 11.5 3 8.39 3 5.28 5.51 2.78 8.59 2.78c3.07 0 5.58 2.5 5.58 5.61 0 3.11-2.51 5.61-5.58 5.61z"/></svg>
-        <input id="search" placeholder="Search sections, pages & content…" />
+        <input id="search" placeholder="Search sections, pages & content…"/>
       </div>
       <div class="sidebar-actions">
         <button id="addSectionBtn" class="btn">+ Section</button>
         <button id="addPageBtn" class="btn">+ Page</button>
       </div>
     </div>
-    <div class="tree" id="tree">
-      <!-- Tree content injected by JS -->
-    </div>
+    <div class="tree" id="tree"></div>
   </aside>
 
   <header>
@@ -283,27 +205,20 @@
       <button class="tool-btn" data-cmd="underline"><u>U</u></button>
       <div class="tool-sep"></div>
       <select id="headingSelect" title="Heading">
-        <option value="p">Paragraph</option>
-        <option value="h1">H1</option>
-        <option value="h2">H2</option>
-        <option value="h3">H3</option>
+        <option value="p">Paragraph</option><option value="h1">H1</option>
+        <option value="h2">H2</option><option value="h3">H3</option>
       </select>
       <select id="fontSizeSelect" title="Font size">
         <option value="default">Font size</option>
-        <option value="12px">12</option>
-        <option value="14px">14</option>
-        <option value="16px">16</option>
-        <option value="18px">18</option>
-        <option value="20px">20</option>
-        <option value="24px">24</option>
+        <option value="12px">12</option><option value="14px">14</option>
+        <option value="16px">16</option><option value="18px">18</option>
+        <option value="20px">20</option><option value="24px">24</option>
         <option value="28px">28</option>
       </select>
       <select id="lineHeightSelect" title="Line spacing">
         <option value="default">Line spacing</option>
-        <option value="1.3">1.3</option>
-        <option value="1.6">1.6</option>
-        <option value="1.8">1.8</option>
-        <option value="2.0">2.0</option>
+        <option value="1.3">1.3</option><option value="1.6">1.6</option>
+        <option value="1.8">1.8</option><option value="2.0">2.0</option>
       </select>
       <input type="color" id="colorPicker" title="Text color"/>
       <div class="tool-sep"></div>
@@ -323,7 +238,7 @@
         <span id="saveIndicator" class="dim">Saved</span>
       </div>
       <div id="editor" contenteditable="true" spellcheck="true"></div>
-      <div class="empty-hint" id="emptyHint" style="display:none">
+      <div class="empty-hint" id="emptyHint">
         <h3>This is a section</h3>
         <p>Sections hold pages. Use <strong>+ Page</strong> to add notes.</p>
       </div>
@@ -356,11 +271,6 @@
   const debounce = (fn, d=500) => { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), d); }; };
   const uuid = () => (crypto?.randomUUID?.() || 'id-'+Math.random().toString(36).slice(2));
   const utf8ToB64 = (str)=> btoa(unescape(encodeURIComponent(str)));
-  const sha256 = async (text) => {
-    const enc = new TextEncoder().encode(text);
-    const buf = await crypto.subtle.digest('SHA-256', enc);
-    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  };
 
   // ---------- IndexedDB ----------
   const DB_NAME = 'notesdb_v1';
@@ -387,35 +297,15 @@
   }
   async function idbGetAll(){
     const [t, s] = tx();
-    return new Promise((res, rej)=>{
-      const req = s.getAll();
-      req.onsuccess = ()=> res(req.result);
-      req.onerror = ()=> rej(req.error);
-    });
+    return new Promise((res, rej)=>{ const r = s.getAll(); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); });
   }
   async function idbPut(node){
     const [t, s] = tx(STORE, 'readwrite');
-    return new Promise((res, rej)=>{
-      const req = s.put(node);
-      req.onsuccess = ()=> res(req.result);
-      req.onerror = ()=> rej(req.error);
-    });
-  }
-  async function idbGet(id){
-    const [t, s] = tx();
-    return new Promise((res, rej)=>{
-      const req = s.get(id);
-      req.onsuccess = ()=> res(req.result);
-      req.onerror = ()=> rej(req.error);
-    });
+    return new Promise((res, rej)=>{ const r = s.put(node); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); });
   }
   async function idbDelete(id){
     const [t, s] = tx(STORE, 'readwrite');
-    return new Promise((res, rej)=>{
-      const req = s.delete(id);
-      req.onsuccess = ()=> res();
-      req.onerror = ()=> rej(req.error);
-    });
+    return new Promise((res, rej)=>{ const r = s.delete(id); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); });
   }
 
   // ---------- Data Model ----------
@@ -423,7 +313,7 @@
   let state = {
     nodes: [],
     selectedId: 'home',
-    expanded: JSON.parse(localStorage.getItem('expanded') || '[]'), // section ids
+    expanded: JSON.parse(localStorage.getItem('expanded') || '[]'),
     filter: ''
   };
 
@@ -433,30 +323,23 @@
       const home = {
         id:'home', type:'home', title:'Home',
         contentHtml: `<h1>Welcome</h1>
-<p>This is your docs-style notes space. Use the green sidebar to add sections and pages. Everything is saved locally in your browser (IndexedDB). Use Export to back up. Optional: configure GitHub Sync to commit your notes JSON to a private repo. Editing is read-only for others by default.</p>`
+<p>This is your docs-style notes space. Use the green sidebar to add sections and pages. Everything is saved locally (IndexedDB). Use Export to back up. Optional: configure GitHub Sync to commit JSON to a private repo. Editing is locked by default for visitors.</p>`
       };
       state.nodes.push(home);
       await idbPut(home);
     }
   }
 
-  function persistExpanded(){
-    localStorage.setItem('expanded', JSON.stringify(state.expanded));
-  }
-
+  function persistExpanded(){ localStorage.setItem('expanded', JSON.stringify(state.expanded)); }
   function toggleExpanded(sectionId){
     const i = state.expanded.indexOf(sectionId);
-    if(i>=0) state.expanded.splice(i,1);
-    else state.expanded.push(sectionId);
-    persistExpanded();
-    renderTree();
+    if(i>=0) state.expanded.splice(i,1); else state.expanded.push(sectionId);
+    persistExpanded(); renderTree();
   }
 
   // ---------- Rendering ----------
   function renderTree(){
-    const wrap = $('#tree');
-    wrap.innerHTML = '';
-
+    const wrap = $('#tree'); wrap.innerHTML = '';
     const filter = state.filter.trim().toLowerCase();
     const match = (s) => s.toLowerCase().includes(filter);
 
@@ -470,38 +353,25 @@
       wrap.appendChild(el);
     }
 
-    // Sections and pages
+    // Sections & pages
     const sections = state.nodes.filter(n=>n.type==='section').sort((a,b)=>(a.order||0)-(b.order||0));
     const pagesByParent = new Map();
     for(const p of state.nodes.filter(n=>n.type==='page')){
       const list = pagesByParent.get(p.parentId) || [];
-      list.push(p);
-      pagesByParent.set(p.parentId, list);
+      list.push(p); pagesByParent.set(p.parentId, list);
     }
-    for(const [k, v] of pagesByParent.entries()){
-      v.sort((a,b)=>(a.order||0)-(b.order||0));
-    }
+    for(const [k,v] of pagesByParent) v.sort((a,b)=>(a.order||0)-(b.order||0));
 
     function sectionMatches(section){
-      if(filter==='' ) return true;
+      if(filter==='') return true;
       if(match(section.title)) return true;
       const pages = pagesByParent.get(section.id) || [];
-      const pageTitleHit = pages.some(p=>match(p.title));
-      if(pageTitleHit) return true;
-      // simple content match for sections
-      const sectionText = textFromHtml(section.contentHtml || '');
-      if(sectionText.toLowerCase().includes(filter)) return true;
-      // page content match
-      for(const p of (pagesByParent.get(section.id) || [])){
-        const t = textFromHtml(p.contentHtml || '');
-        if(t.toLowerCase().includes(filter)) return true;
-      }
+      if(pages.some(p=>match(p.title))) return true;
       return false;
     }
 
     for(const sec of sections){
       if(!sectionMatches(sec)) continue;
-
       const secEl = document.createElement('div');
       secEl.className = 'node' + (state.selectedId===sec.id?' selected':'');
       const isOpen = state.expanded.includes(sec.id);
@@ -513,24 +383,18 @@
           <button class="icon" title="Add page">＋</button>
           <button class="icon" title="Delete">🗑</button>
         </span>`;
-      secEl.onclick = (e)=>{
-        if(e.target.closest('button')) return; // action buttons
-        toggleExpanded(sec.id);
-      };
+      secEl.onclick = (e)=>{ if(e.target.closest('button')) return; toggleExpanded(sec.id); };
       secEl.dataset.id = sec.id;
       wrap.appendChild(secEl);
 
-      const actions = secEl.querySelectorAll('button.icon');
-      actions[0].onclick = async (e)=>{ e.stopPropagation(); await promptRename(sec.id); };
-      actions[1].onclick = async (e)=>{ e.stopPropagation(); await addPage(sec.id); };
-      actions[2].onclick = async (e)=>{ e.stopPropagation(); await deleteNode(sec.id); };
-
-      // Click label selects section for editing overview
+      const [renameBtn, addBtn, delBtn] = secEl.querySelectorAll('button.icon');
+      renameBtn.onclick = async (e)=>{ e.stopPropagation(); await promptRename(sec.id); };
+      addBtn.onclick = async (e)=>{ e.stopPropagation(); await addPage(sec.id); };
+      delBtn.onclick = async (e)=>{ e.stopPropagation(); await deleteNode(sec.id); };
       secEl.querySelector('.label').onclick = (e)=>{ e.stopPropagation(); selectNode(sec.id); };
 
       if(isOpen){
-        const childrenEl = document.createElement('div');
-        childrenEl.className = 'children';
+        const childrenEl = document.createElement('div'); childrenEl.className = 'children';
         const pages = (pagesByParent.get(sec.id) || []).filter(p=> filter==='' || match(p.title));
         for(const p of pages){
           const pageEl = document.createElement('div');
@@ -552,80 +416,59 @@
 
     if(sections.length===0){
       const empty = document.createElement('div');
-      empty.className = 'node dim';
-      empty.style.cursor='default';
+      empty.className = 'node dim'; empty.style.cursor='default';
       empty.innerHTML = '<span class="twisty">ⓘ</span><span class="label">No sections yet. Click "+ Section".</span>';
       wrap.appendChild(empty);
     }
   }
 
-  function escapeHtml(s){ return s.replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
+  function escapeHtml(s){ return (s||'').replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
 
   async function selectNode(id){
     state.selectedId = id;
     const node = state.nodes.find(n=>n.id===id);
     $('#crumb').textContent = node?.title || 'Untitled';
-    if(node){
-      $('#emptyHint').style.display='none';
-      $('#titleInput').style.display='block';
-      $('#editor').style.display='block';
-      $('#titleInput').value = node.title || '';
-      $('#editor').innerHTML = node.contentHtml || '';
-      MathJax?.typesetPromise?.([$('#editor')]).then(()=>ensureCaretOutsideMath());
-    }
+    $('#titleInput').value = node?.title || '';
+    $('#editor').innerHTML = node?.contentHtml || '';
+    $('#emptyHint').style.display = node ? 'none' : 'block';
     renderTree();
-    updateEditability();
+    MathJax?.typesetPromise?.([$('#editor')]).then(()=>ensureCaretOutsideMath());
   }
 
   // ---------- CRUD ----------
   async function addSection(){
-    const title = await promptModal('New Section', 'Section title', '');
-    if(title === null) return;
+    const title = await promptModal('New Section', 'Section title', ''); if(title===null) return;
     const node = { id: uuid(), type:'section', title: title.trim() || 'Untitled Section', order: Date.now(), contentHtml:'<p>Section overview…</p>' };
-    state.nodes.push(node);
-    await idbPut(node);
+    state.nodes.push(node); await idbPut(node);
     if(!state.expanded.includes(node.id)){ state.expanded.push(node.id); persistExpanded(); }
-    renderTree();
-    selectNode(node.id);
+    renderTree(); selectNode(node.id);
   }
-
   async function addPage(parentId){
-    let title = await promptModal('New Page', 'Page title', '');
-    if(title===null) return;
+    let title = await promptModal('New Page', 'Page title', ''); if(title===null) return;
     title = title.trim() || 'Untitled Page';
     const node = { id: uuid(), type:'page', parentId, title, order: Date.now(), contentHtml: '<p></p>' };
-    state.nodes.push(node);
-    await idbPut(node);
-    renderTree();
-    selectNode(node.id);
+    state.nodes.push(node); await idbPut(node);
+    renderTree(); selectNode(node.id);
   }
-
   async function promptRename(id){
-    const node = state.nodes.find(n=>n.id===id);
-    if(!node) return;
-    const title = await promptModal('Rename', 'New title', node.title || '');
-    if(title===null) return;
-    node.title = title.trim() || node.title;
-    await idbPut(node);
+    const node = state.nodes.find(n=>n.id===id); if(!node) return;
+    const title = await promptModal('Rename', 'New title', node.title || ''); if(title===null) return;
+    node.title = title.trim() || node.title; await idbPut(node);
     if(id===state.selectedId){ $('#crumb').textContent = node.title; $('#titleInput').value = node.title; }
     renderTree();
   }
-
   async function deleteNode(id){
-    const node = state.nodes.find(n=>n.id===id);
-    if(!node) return;
+    const node = state.nodes.find(n=>n.id===id); if(!node) return;
     if(node.type==='home'){ toast('Cannot delete Home'); return; }
     let msg = 'Delete "'+node.title+'"?';
     if(node.type==='section'){
       const childCount = state.nodes.filter(n=>n.parentId===id && n.type==='page').length;
       if(childCount>0) msg += ` This will also delete ${childCount} page(s).`;
     }
-    const ok = await confirmModal('Delete', msg);
-    if(!ok) return;
-
+    const ok = await confirmModal('Delete', msg); if(!ok) return;
     if(node.type==='section'){
       const children = state.nodes.filter(n=>n.parentId===id);
-      for(const c of children){ await idbDelete(c.id); }
+      for(const c of children) await idbDelete(c.id);
       state.nodes = state.nodes.filter(n=>n.parentId!==id);
     }
     await idbDelete(id);
@@ -634,10 +477,8 @@
     renderTree();
   }
 
-  // ---------- Editor + Toolbar ----------
-  const editor = $('#editor');
-  const titleInput = $('#titleInput');
-  const saveIndicator = $('#saveIndicator');
+  // ---------- Editor & Toolbar ----------
+  const editor = $('#editor'); const titleInput = $('#titleInput'); const saveIndicator = $('#saveIndicator');
 
   let lastRange = null;
   function saveSelection(){
@@ -646,20 +487,24 @@
     const r = sel.getRangeAt(0);
     if(editor.contains(r.startContainer)) lastRange = r.cloneRange();
   }
+  function placeCaretAtEnd(el){
+    el.focus();
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    lastRange = range.cloneRange();
+  }
   function restoreSelection(){
+    editor.focus();
     if(lastRange){
       const sel = window.getSelection();
       sel.removeAllRanges();
       sel.addRange(lastRange);
-    }else{
-      editor.focus();
-      const range = document.createRange();
-      range.selectNodeContents(editor);
-      range.collapse(false);
-      const sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(range);
-      lastRange = range.cloneRange();
+    } else {
+      placeCaretAtEnd(editor);
     }
   }
   function placeCaretAfter(node){
@@ -669,11 +514,7 @@
     const sel = window.getSelection();
     sel.removeAllRanges();
     sel.addRange(range);
-    saveSelection();
-  }
-  function nearestBlock(node){
-    if(node.nodeType===3) node = node.parentElement;
-    return node.closest('p,div,li,h1,h2,h3,h4,h5,h6,pre,blockquote') || editor;
+    lastRange = range.cloneRange();
   }
   function ensureCaretOutsideMath(){
     const sel = window.getSelection();
@@ -682,7 +523,6 @@
     if(anchor && anchor.nodeType===3) anchor = anchor.parentElement;
     const mjx = anchor?.closest ? anchor.closest('mjx-container') : null;
     if(mjx){
-      // add single space node AFTER the mjx's parent wrapper (often the same as mjx.parentNode)
       const parent = mjx.parentNode;
       const next = mjx.nextSibling;
       if(!(next && next.nodeType===3 && /^\s$/.test(next.nodeValue))){
@@ -697,599 +537,275 @@
   editor.addEventListener('focus', saveSelection);
 
   function exec(cmd, val=null){ document.execCommand(cmd, false, val); editor.focus(); saveSelection(); }
-
-  function applyHeading(tag){
-    if(tag==='p'){ document.execCommand('formatBlock', false, 'p'); }
-    else document.execCommand('formatBlock', false, tag);
-  }
-  function applyFontSize(size){
-    if(size==='default') return;
-    wrapSelectionWithSpan({ fontSize: size });
-  }
-  function applyLineHeight(lh){
-    if(lh==='default') return;
-    wrapSelectionBlockStyle({ lineHeight: lh });
-  }
+  function applyHeading(tag){ document.execCommand('formatBlock', false, tag==='p'?'p':tag); }
   function wrapSelectionWithSpan(styleObj){
     restoreSelection();
-    const sel = window.getSelection();
-    if(!sel.rangeCount) return;
+    const sel = window.getSelection(); if(!sel.rangeCount) return;
     const range = sel.getRangeAt(0);
-    const span = document.createElement('span');
-    Object.assign(span.style, styleObj);
-    try{
-      range.surroundContents(span);
-    }catch(err){
-      span.appendChild(range.extractContents());
-      range.insertNode(span);
-    }
-    sel.removeAllRanges();
-    const nr = document.createRange();
-    nr.selectNodeContents(span);
-    sel.addRange(nr);
-    saveSelection();
+    const span = document.createElement('span'); Object.assign(span.style, styleObj);
+    try{ range.surroundContents(span); }catch{ span.appendChild(range.extractContents()); range.insertNode(span); }
+    sel.removeAllRanges(); const nr = document.createRange(); nr.selectNodeContents(span); sel.addRange(nr);
+    lastRange = nr.cloneRange();
   }
   function wrapSelectionBlockStyle(styleObj){
     restoreSelection();
-    const sel = window.getSelection();
-    if(!sel.rangeCount) return;
-    let node = sel.anchorNode;
-    if(node.nodeType===3) node = node.parentElement;
-    const block = nearestBlock(node);
-    Object.assign(block.style, styleObj);
-    saveSelection();
+    const sel = window.getSelection(); if(!sel.rangeCount) return;
+    let node = sel.anchorNode; if(node.nodeType===3) node = node.parentElement;
+    const block = node.closest('p,div,li,h1,h2,h3,h4,h5,h6,pre,blockquote') || editor;
+    Object.assign(block.style, styleObj); saveSelection();
   }
 
-  // Custom Link modal
   async function insertLinkModal(){
     restoreSelection();
-    const sel = window.getSelection();
-    const selectedText = sel && sel.toString();
+    const sel = window.getSelection(); const selectedText = sel && sel.toString();
     const body = `
       <label style="display:block; font-size:13px; color:#374151; margin-bottom:6px;">Text</label>
       <input id="linkText" type="text" value="${escapeHtml(selectedText || '')}" placeholder="Link text (optional)"/>
       <div style="height:10px"></div>
       <label style="display:block; font-size:13px; color:#374151; margin-bottom:6px;">URL</label>
-      <input id="linkUrl" type="url" placeholder="https://example.com"/>
-    `;
-    const promise = showModal({title:'Insert Link', bodyHtml:body, okText:'Insert', cancelText:'Cancel'});
+      <input id="linkUrl" type="url" placeholder="https://example.com"/>`;
+    const p = showModal({title:'Insert Link', bodyHtml:body, okText:'Insert', cancelText:'Cancel'});
     await 0;
-    const okHandler = async ()=>{
+    $('#modalOk').onclick = ()=>{
       const text = $('#linkText').value.trim();
-      const url = $('#linkUrl').value.trim();
-      if(!url) return;
-      if(selectedText){
-        restoreSelection();
-        document.execCommand('createLink', false, url);
-        if(text && text !== selectedText){
-          const a = window.getSelection().anchorNode.parentElement.closest('a');
-          if(a){ a.textContent = text; }
-        }
+      const url = $('#linkUrl').value.trim(); if(!url) return;
+      restoreSelection();
+      if(selectedText){ document.execCommand('createLink', false, url);
+        if(text && text !== selectedText){ const a = window.getSelection().anchorNode.parentElement.closest('a'); if(a){ a.textContent = text; } }
       }else{
-        const a = document.createElement('a');
-        a.href = url; a.textContent = text || url; a.target = '_blank';
-        restoreSelection();
-        const range = window.getSelection().getRangeAt(0);
-        range.collapse(false);
-        range.insertNode(a);
-        placeCaretAfter(a);
+        const a = document.createElement('a'); a.href=url; a.textContent=text||url; a.target='_blank';
+        const range = window.getSelection().getRangeAt(0); range.collapse(false); range.insertNode(a); placeCaretAfter(a);
       }
-      saveContentDebounced();
-      $('#modalBackdrop').style.display='none';
+      saveContentDebounced(); $('#modalBackdrop').style.display='none';
     };
-    $('#modalOk').onclick = okHandler;
     $('#modalCancel').onclick = ()=> $('#modalBackdrop').style.display='none';
     $('#modalClose').onclick = ()=> $('#modalBackdrop').style.display='none';
-    await promise;
+    await p;
   }
 
-  // Insert Image via file input or drag-drop
   function insertImageFile(file){
     const reader = new FileReader();
     reader.onload = () => {
-      const img = document.createElement('img');
-      img.src = reader.result;
-      img.alt = file.name || 'image';
-      restoreSelection();
-      const range = window.getSelection().getRangeAt(0);
-      range.collapse(false);
-      range.insertNode(img);
-      placeCaretAfter(img);
+      const img = document.createElement('img'); img.src = reader.result; img.alt = file.name || 'image';
+      restoreSelection(); const range = window.getSelection().getRangeAt(0); range.collapse(false); range.insertNode(img); placeCaretAfter(img);
       saveContentDebounced();
     };
     reader.readAsDataURL(file);
   }
+  editor.addEventListener('dragover', (e)=> e.preventDefault());
+  editor.addEventListener('drop', (e)=>{ e.preventDefault(); const files=e.dataTransfer.files; if(files) for(const f of files){ if(f.type.startsWith('image/')) insertImageFile(f); }});
+  editor.addEventListener('paste', (e)=>{ const it=e.clipboardData?.items||[]; for(const t of it){ if(t.type?.startsWith('image/')){ const f=t.getAsFile(); if(f) insertImageFile(f); }}});
 
-  // Drag & Drop
-  editor.addEventListener('dragover', (e)=>{
-    e.preventDefault();
-  });
-  editor.addEventListener('drop', (e)=>{
-    e.preventDefault();
-    const files = e.dataTransfer.files;
-    if(files && files.length){
-      for(const f of files){
-        if(f.type.startsWith('image/')) insertImageFile(f);
-      }
-    }
-  });
-
-  // Paste image support
-  editor.addEventListener('paste', (e)=>{
-    const items = e.clipboardData?.items || [];
-    for(const it of items){
-      if(it.type && it.type.startsWith('image/')){
-        const file = it.getAsFile();
-        if(file) insertImageFile(file);
-      }
-    }
-  });
-
-  // Insert Formula (LaTeX) via modal
   async function insertFormula(){
     saveSelection();
     const latex = await promptModal('Insert Formula', 'Enter LaTeX (inline with $...$ or display with $$...$$)', '');
     if(latex===null || latex.trim()==='') return;
-    editor.focus();
     restoreSelection();
     const span = document.createElement('span');
     const content = latex.trim();
-    if(content.startsWith('$$') || content.startsWith('\\[') || content.startsWith('\\(') || content.startsWith('$')){
+    if(content.startsWith('$$') || content.startsWith('\\[') || content.startsWith('\\(') || content.startsWith('$'))
       span.textContent = content;
-    }else{
-      span.textContent = '$' + content + '$';
-    }
+    else span.textContent = '$' + content + '$';
     const range = window.getSelection().getRangeAt(0);
-    range.collapse(false);
-    range.insertNode(span);
-    // always add a spacer and move caret outside
-    let spacer = document.createTextNode(' ');
+    range.collapse(false); range.insertNode(span);
+    // spacer & caret outside math
+    const spacer = document.createTextNode(' ');
     span.parentNode.insertBefore(spacer, span.nextSibling);
     placeCaretAfter(spacer);
     MathJax?.typesetPromise?.([span]).then(()=>ensureCaretOutsideMath());
     saveContentDebounced();
   }
 
-  // Clear formatting (selection or current block) without adding newlines
-  function cleanElement(root){
-    // remove inline styles & classes
-    root.querySelectorAll('[style]').forEach(el=> el.removeAttribute('style'));
-    root.querySelectorAll('[class]').forEach(el=> el.removeAttribute('class'));
-    // headings -> paragraphs
-    root.querySelectorAll('h1,h2,h3,h4,h5,h6').forEach(h=>{
-      const p = document.createElement('p'); p.innerHTML = h.innerHTML; h.parentNode.replaceChild(p, h);
-    });
-    // unwrap pure formatting tags
-    root.querySelectorAll('b,strong,i,em,u,font,span').forEach(el=>{
-      if(el.tagName.toLowerCase()==='span' && el.attributes.length>0) return; // keep spans with attributes
-      const parent = el.parentNode;
-      while(el.firstChild) parent.insertBefore(el.firstChild, el);
-      parent.removeChild(el);
-    });
-  }
-  function clearFormatting(){
-    editor.focus();
-    const sel = window.getSelection();
-    if(!sel.rangeCount) return;
-    const range = sel.getRangeAt(0);
-
-    if(range.collapsed){
-      // operate on current block
-      const block = nearestBlock(range.startContainer);
-      if(block && editor.contains(block)){
-        // clone, clean, replace
-        const shadow = block.cloneNode(true);
-        cleanElement(shadow);
-        block.replaceWith(shadow);
-        placeCaretAfter(shadow);
-      }
-      document.execCommand('formatBlock', false, 'p');
-      saveContentDebounced();
-      return;
-    }
-
-    // Selection case: replace selected contents with cleaned version
-    const frag = range.cloneContents();
-    const temp = document.createElement('div');
-    temp.appendChild(frag);
-    cleanElement(temp);
-    const cleanedFrag = document.createDocumentFragment();
-    const nodes = Array.from(temp.childNodes);
-    nodes.forEach(n=> cleanedFrag.appendChild(n));
-    range.deleteContents();
-    const insertAt = range.startContainer;
-    const inserted = cleanedFrag.cloneNode(true);
-    range.insertNode(cleanedFrag);
-    // position caret after last inserted node
-    const last = nodes[nodes.length-1];
-    if(last && last.parentNode){ placeCaretAfter(last); }
+  // CLEAR: wipe entire editor content (not the title)
+  function clearAllContent(){
+    $('#editor').innerHTML = '';
     saveContentDebounced();
   }
 
-  // Save current node content/title
-  const saveContentDebounced = debounce(saveContent, 400);
+  // Save
+  const saveContentDebounced = debounce(saveContent, 300);
   async function saveContent(){
-    const node = state.nodes.find(n=>n.id===state.selectedId);
-    if(!node) return;
+    const node = state.nodes.find(n=>n.id===state.selectedId); if(!node) return;
     node.title = titleInput.value || node.title;
     node.contentHtml = editor.innerHTML;
     await idbPut(node);
     showSaved();
-    if(getGhCfg().auto){ githubCommit('Auto-sync'); }
+    if(getGhCfg().auto && getEditEnabled()){ githubCommit('Auto-sync'); }
     renderTree();
   }
-  function showSaved(){
-    saveIndicator.textContent = 'Saved';
-    const s = $('#status'); s.textContent = 'Saved'; s.classList.add('show');
-    setTimeout(()=> s.classList.remove('show'), 900);
-  }
+  function showSaved(){ const s = $('#status'); s.textContent = 'Saved'; s.classList.add('show'); setTimeout(()=> s.classList.remove('show'), 900); }
 
-  // Auto-render LaTeX after boundary chars; then force caret outside math
-  const typesetDebounced = debounce(()=>{
-    MathJax?.typesetPromise?.([editor]).then(()=>ensureCaretOutsideMath());
-  }, 250);
-  editor.addEventListener('input', (e)=>{
-    saveContentDebounced();
-    const ch = (e.data || '').toString();
-    if(ch && /[\s),.;:!?]/.test(ch)){ typesetDebounced(); }
-  });
+  // Auto LaTeX typeset after boundary chars, then force caret outside math
+  const typesetDebounced = debounce(()=>{ MathJax?.typesetPromise?.([editor]).then(()=>ensureCaretOutsideMath()); }, 200);
+  editor.addEventListener('input', (e)=>{ const ch=(e.data||'').toString(); if(ch && /[\s),.;:!?]/.test(ch)) typesetDebounced(); saveSelection(); saveContentDebounced(); });
 
   // ---------- Modal helpers ----------
   function showModal({title, bodyHtml, okText='OK', cancelText='Cancel'}){
-    $('#modalTitle').textContent = title;
-    $('#modalBody').innerHTML = bodyHtml;
-    $('#modalOk').textContent = okText;
-    $('#modalCancel').textContent = cancelText;
+    $('#modalTitle').textContent = title; $('#modalBody').innerHTML = bodyHtml;
+    $('#modalOk').textContent = okText; $('#modalCancel').textContent = cancelText;
     $('#modalBackdrop').style.display='flex';
-    return new Promise((resolve)=>{
-      const close = (val)=>{
-        $('#modalBackdrop').style.display='none';
-        resolve(val);
-      };
-      $('#modalOk').onclick = ()=> close(true);
-      $('#modalCancel').onclick = ()=> close(false);
-      $('#modalClose').onclick = ()=> close(false);
+    return new Promise((resolve)=>{ const close=(v)=>{ $('#modalBackdrop').style.display='none'; resolve(v); };
+      $('#modalOk').onclick = ()=> close(true); $('#modalCancel').onclick = ()=> close(false); $('#modalClose').onclick = ()=> close(false);
     });
   }
   async function promptModal(title, placeholder, value=''){
-    const promise = showModal({title, bodyHtml:`<input id="modalInput" type="text" placeholder="${escapeHtml(placeholder)}" value="${escapeHtml(value)}" />`});
-    await 0; // microtask
-    $('#modalInput').focus();
-    return new Promise(async (resolve)=>{
-      const ok = await promise;
-      if(ok) resolve($('#modalInput').value);
-      else resolve(null);
-    });
+    const p = showModal({title, bodyHtml:`<input id="modalInput" type="text" placeholder="${escapeHtml(placeholder)}" value="${escapeHtml(value)}" />`});
+    await 0; $('#modalInput').focus();
+    const ok = await p; return ok ? $('#modalInput').value : null;
   }
-  async function confirmModal(title, message){
-    const promise = showModal({title, bodyHtml:`<p>${escapeHtml(message)}</p>`, okText:'Delete', cancelText:'Cancel'});
-    return promise;
-  }
-  function toast(text){
-    const s = $('#status'); s.textContent = text; s.classList.add('show');
-    setTimeout(()=> s.classList.remove('show'), 1400);
-  }
+  async function confirmModal(title, message){ return showModal({title, bodyHtml:`<p>${escapeHtml(message)}</p>`, okText:'Delete', cancelText:'Cancel'}); }
+  function toast(text){ const s=$('#status'); s.textContent=text; s.classList.add('show'); setTimeout(()=> s.classList.remove('show'), 1400); }
 
   // ---------- Export / Import ----------
   async function exportAll(){
     const nodes = await idbGetAll();
-    const payload = {
-      version: 1,
-      exportedAt: new Date().toISOString(),
-      expanded: state.expanded,
-      nodes
-    };
+    const payload = { version: 1, exportedAt: new Date().toISOString(), expanded: state.expanded, nodes };
     const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'notes-export.json';
-    document.body.appendChild(a);
-    a.click();
-    URL.revokeObjectURL(a.href);
-    a.remove();
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'notes-export.json';
+    document.body.appendChild(a); a.click(); URL.revokeObjectURL(a.href); a.remove();
   }
   async function importAll(file){
-    const text = await file.text();
-    let data;
-    try{ data = JSON.parse(text); } catch(e){ toast('Invalid JSON'); return; }
+    const text = await file.text(); let data;
+    try{ data = JSON.parse(text); } catch{ toast('Invalid JSON'); return; }
     if(!data?.nodes || !Array.isArray(data.nodes)){ toast('Invalid export file'); return; }
-    const existing = await idbGetAll();
-    const map = new Map(existing.map(n=>[n.id, n]));
-    for(const n of data.nodes){
-      map.set(n.id, n);
-      await idbPut(n);
-    }
+    const existing = await idbGetAll(); const map = new Map(existing.map(n=>[n.id,n]));
+    for(const n of data.nodes){ map.set(n.id, n); await idbPut(n); }
     state.nodes = Array.from(map.values());
     if(Array.isArray(data.expanded)) { state.expanded = data.expanded; persistExpanded(); }
-    renderTree();
-    selectNode('home');
-    toast('Imported');
+    renderTree(); selectNode('home'); toast('Imported');
   }
 
   // ---------- Search (title + full content) ----------
-  function textFromHtml(html){
-    const tmp = document.createElement('div');
-    tmp.innerHTML = html || '';
-    return tmp.textContent || '';
-  }
+  function textFromHtml(html){ const tmp=document.createElement('div'); tmp.innerHTML=html||''; return tmp.textContent||''; }
   function findAllOccurrences(text, query){
-    const q = query.toLowerCase();
-    const t = text.toLowerCase();
-    const idxs = [];
-    let start = 0;
-    while(true){
-      const i = t.indexOf(q, start);
-      if(i===-1) break;
-      idxs.push(i);
-      start = i + q.length;
-      if(idxs.length>200) break;
-    }
-    return idxs;
+    const q=query.toLowerCase(), t=text.toLowerCase(); const idxs=[]; let start=0;
+    while(true){ const i=t.indexOf(q,start); if(i===-1) break; idxs.push(i); start=i+q.length; if(idxs.length>200) break; } return idxs;
   }
-  function buildSnippet(text, index, qlen){
-    const start = Math.max(0, index-50);
-    const end = Math.min(text.length, index+qlen+50);
-    return text.slice(start, end);
-  }
+  function buildSnippet(text, index, qlen){ const start=Math.max(0,index-50), end=Math.min(text.length,index+qlen+50); return text.slice(start,end); }
   async function openSearchResults(query){
-    if(!query || !query.trim()){ return; }
-    const q = query.trim();
-    const results = [];
+    if(!query || !query.trim()) return; const q=query.trim();
+    const results=[];
     for(const n of state.nodes){
       if(n.type==='page' || n.type==='home' || n.type==='section'){
-        const titleMatch = n.title.toLowerCase().includes(q.toLowerCase());
         const text = textFromHtml(n.contentHtml || '');
         const idxs = findAllOccurrences(text, q);
-        if(titleMatch || idxs.length){
-          const snippets = idxs.slice(0,5).map(i=> buildSnippet(text, i, q.length));
-          results.push({ id:n.id, title:n.title, matches:idxs.length, snippets });
+        if(n.title.toLowerCase().includes(q.toLowerCase()) || idxs.length){
+          results.push({ id:n.id, title:n.title, matches:idxs.length, snippets: idxs.slice(0,5).map(i=>buildSnippet(text,i,q.length)) });
         }
       }
     }
     results.sort((a,b)=> b.matches - a.matches);
-
     const body = results.length ? results.map(r=>{
       const snips = r.snippets.map(s=>{
-        const safe = escapeHtml(s);
-        const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'ig');
-        const highlighted = safe.replace(re, (m)=>`<mark>${m}</mark>`);
-        return `<div class="snippet">${highlighted}</div>`;
+        const safe=escapeHtml(s);
+        const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'ig');
+        return `<div class="snippet">${safe.replace(re, m=>`<mark>${m}</mark>`)}</div>`;
       }).join('');
-      return `<div class="result">
-        <div class="where"><strong>${escapeHtml(r.title)}</strong> — ${r.matches} match(es)</div>
-        ${snips}
-        <div style="margin-top:6px">
-          <button class="btn btn-ghost" data-open="${r.id}" data-q="${escapeHtml(q)}">Open</button>
-        </div>
-      </div>`;
+      return `<div class="result"><div class="where"><strong>${escapeHtml(r.title)}</strong> — ${r.matches} match(es)</div>${snips}
+        <div style="margin-top:6px"><button class="btn btn-ghost" data-open="${r.id}" data-q="${escapeHtml(q)}">Open</button></div></div>`;
     }).join('') : '<p>No results.</p>';
-
-    const promise = showModal({title:`Search Results for "${escapeHtml(q)}"`, bodyHtml: body, okText:'Close', cancelText:'Close'});
-    await 0; // let modal render
+    const p = showModal({title:`Search Results for "${escapeHtml(q)}"`, bodyHtml: body, okText:'Close', cancelText:'Close'});
+    await 0;
     const searchInput = $('#search');
     $$('#modalBody .btn[data-open]').forEach(btn=>{
       btn.addEventListener('click', ()=>{
-        const id = btn.getAttribute('data-open');
-        const q2 = btn.getAttribute('data-q');
+        const id = btn.getAttribute('data-open'); const q2 = btn.getAttribute('data-q');
         $('#modalBackdrop').style.display='none';
-        // Clear sidebar search and filter
-        searchInput.value='';
-        state.filter='';
-        renderTree();
-        selectNode(id).then(()=>{
-          scrollToQueryInEditor(q2);
-          toast('Jumped to result');
-        });
+        searchInput.value=''; state.filter=''; renderTree();
+        selectNode(id).then(()=>{ scrollToQueryInEditor(q2); toast('Jumped to result'); });
       });
     });
-    await promise;
+    await p;
   }
   function scrollToQueryInEditor(query){
-    const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);
-    const q = query.toLowerCase();
-    let node;
-    while((node = walker.nextNode())){
-      const i = node.textContent.toLowerCase().indexOf(q);
+    const walker=document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null); const q=query.toLowerCase(); let node;
+    while((node=walker.nextNode())){
+      const i=node.textContent.toLowerCase().indexOf(q);
       if(i>=0){
-        const range = document.createRange();
-        range.setStart(node, i);
-        range.setEnd(node, i+q.length);
-        const rect = range.getBoundingClientRect();
+        const range=document.createRange(); range.setStart(node,i); range.setEnd(node,i+q.length);
+        const rect=range.getBoundingClientRect();
         editor.scrollTop = editor.scrollTop + rect.top - editor.getBoundingClientRect().top - 60;
-        const sel = window.getSelection();
-        sel.removeAllRanges(); sel.addRange(range);
-        setTimeout(()=> sel.removeAllRanges(), 800);
-        break;
+        const sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(range); setTimeout(()=> sel.removeAllRanges(), 800); break;
       }
     }
   }
 
   // ---------- GitHub Sync (optional) ----------
-  function getGhCfg(){
-    const raw = localStorage.getItem('ghSyncConfig');
-    try{ return raw ? JSON.parse(raw) : { enabled:false, auto:false }; }catch{ return { enabled:false, auto:false }; }
-  }
-  function setGhCfg(cfg){
-    localStorage.setItem('ghSyncConfig', JSON.stringify(cfg));
-    updateEditability();
-  }
+  function getGhCfg(){ try{ return JSON.parse(localStorage.getItem('ghSyncConfig')||'{}'); }catch{ return {}; } }
+  function setGhCfg(cfg){ localStorage.setItem('ghSyncConfig', JSON.stringify(cfg)); }
   async function ghConfigModal(){
     const cfg = getGhCfg();
     const body = `
-      <p style="font-size:13px; color:#374151; margin-top:0">
-        Commit your notes (as JSON) directly to a GitHub repo using a fine-grained Personal Access Token (PAT). This runs entirely in your browser — your token is stored in <code>localStorage</code> on this device only.
-      </p>
+      <p style="font-size:13px; color:#374151; margin-top:0">Commit notes (JSON) to a GitHub repo using a fine-grained PAT. Stored only in this browser.</p>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
-        <div>
-          <label style="font-size:12px">Owner</label>
-          <input id="ghOwner" type="text" value="${escapeHtml(cfg.owner||'')}" placeholder="your-username"/>
-        </div>
-        <div>
-          <label style="font-size:12px">Repo</label>
-          <input id="ghRepo" type="text" value="${escapeHtml(cfg.repo||'')}" placeholder="notes-repo"/>
-        </div>
-        <div>
-          <label style="font-size:12px">Branch</label>
-          <input id="ghBranch" type="text" value="${escapeHtml(cfg.branch||'main')}" placeholder="main"/>
-        </div>
-        <div>
-          <label style="font-size:12px">Path</label>
-          <input id="ghPath" type="text" value="${escapeHtml(cfg.path||'notes-export.json')}" placeholder="path/in/repo/notes.json"/>
-        </div>
+        <div><label style="font-size:12px">Owner</label><input id="ghOwner" type="text" value="${escapeHtml(cfg.owner||'')}" placeholder="your-username"/></div>
+        <div><label style="font-size:12px">Repo</label><input id="ghRepo" type="text" value="${escapeHtml(cfg.repo||'')}" placeholder="notes-repo"/></div>
+        <div><label style="font-size:12px">Branch</label><input id="ghBranch" type="text" value="${escapeHtml(cfg.branch||'main')}" placeholder="main"/></div>
+        <div><label style="font-size:12px">Path</label><input id="ghPath" type="text" value="${escapeHtml(cfg.path||'notes-export.json')}" placeholder="path/in/repo/notes.json"/></div>
       </div>
-      <div style="margin-top:10px">
-        <label style="font-size:12px">PAT (fine-grained, Contents: Read/Write for this repo only)</label>
-        <input id="ghToken" type="text" value="${escapeHtml(cfg.token||'')}" placeholder="ghp_..."/>
-      </div>
-      <div style="margin-top:10px">
-        <label><input id="ghEnabled" type="checkbox" ${cfg.enabled?'checked':''}/> Enable GitHub Sync</label>
-        <label style="margin-left:14px"><input id="ghAuto" type="checkbox" ${cfg.auto?'checked':''}/> Auto-sync on save</label>
-      </div>
-      <div style="margin-top:10px; display:flex; gap:8px">
-        <button class="btn btn-ghost" id="ghTest">Test & Save</button>
-        <button class="btn btn-ghost" id="ghPush">Sync Now</button>
-      </div>
-      <hr style="margin:16px 0">
-      <p style="font-size:13px; color:#374151; margin-top:0"><strong>Owner Edit PIN</strong> (optional soft lock to keep UI read-only for others)</p>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
-        <div>
-          <label style="font-size:12px">Set/Change PIN</label>
-          <input id="pinSet" type="password" placeholder="new PIN"/>
-        </div>
-        <div>
-          <label style="font-size:12px">Confirm</label>
-          <input id="pinSet2" type="password" placeholder="confirm PIN"/>
-        </div>
-      </div>
-      <div style="margin-top:10px">
-        <button class="btn btn-ghost" id="pinSave">Save PIN</button>
-      </div>
-    `;
-    const promise = showModal({title:'GitHub Sync & Owner Settings', bodyHtml: body, okText:'Close', cancelText:'Close'});
-    (async ()=>{
-      await 0;
-      const collect = ()=> ({
-        owner: $('#ghOwner').value.trim(),
-        repo: $('#ghRepo').value.trim(),
-        branch: $('#ghBranch').value.trim() || 'main',
-        path: $('#ghPath').value.trim() || 'notes-export.json',
-        token: $('#ghToken').value.trim(),
-        enabled: $('#ghEnabled').checked,
-        auto: $('#ghAuto').checked
-      });
-      $('#ghTest').onclick = async ()=>{
-        const ncfg = collect();
-        setGhCfg(ncfg);
-        const ok = await githubCommit('Test commit (dry run)', true);
-        toast(ok ? 'Config looks good' : 'Config failed');
-      };
-      $('#ghPush').onclick = async ()=>{
-        const ncfg = collect();
-        setGhCfg(ncfg);
-        const ok = await githubCommit('Manual sync');
-        toast(ok ? 'Synced to GitHub' : 'Sync failed');
-      };
-      $('#pinSave').onclick = async ()=>{
-        const p1 = $('#pinSet').value;
-        const p2 = $('#pinSet2').value;
-        if(!p1 || p1!==p2){ toast('PIN mismatch'); return; }
-        const hash = await sha256(p1);
-        localStorage.setItem('editPinHash', hash);
-        toast('PIN saved');
-      };
-    })();
-    return promise;
-  }
-  function getEditEnabled(){ return localStorage.getItem('editingEnabled')==='true'; }
-  function setEditEnabled(v){ localStorage.setItem('editingEnabled', v ? 'true' : 'false'); updateEditability(); }
-  async function toggleEdit(){
-    const pinHash = localStorage.getItem('editPinHash');
-    const enabled = getEditEnabled();
-    if(enabled){
-      setEditEnabled(false);
-      toast('Editing locked');
-      return;
-    }
-    if(!pinHash){
-      const p1 = await promptSecure('Set Owner PIN', 'Enter new PIN');
-      if(!p1) return;
-      const p2 = await promptSecure('Confirm PIN', 'Re-enter PIN');
-      if(p1!==p2){ toast('PIN mismatch'); return; }
-      const hash = await sha256(p1);
-      localStorage.setItem('editPinHash', hash);
-      setEditEnabled(true);
-      toast('Editing unlocked');
-      return;
-    }else{
-      const p = await promptSecure('Unlock Editing', 'Enter PIN to unlock');
-      if(!p) return;
-      const hash = await sha256(p);
-      if(hash===pinHash){
-        setEditEnabled(true);
-        toast('Editing unlocked');
-      }else{
-        toast('Incorrect PIN');
-      }
-    }
-  }
-  function updateEditability(){
-    const cfg = getGhCfg();
-    const editable = getEditEnabled() || !!cfg.token; // if token present on this device, allow editing
-    $('#toolbar').classList.toggle('disabled', !editable);
-    $('#editor').setAttribute('contenteditable', editable ? 'true' : 'false');
-    $('#addSectionBtn').disabled = !editable;
-    $('#addPageBtn').disabled = !editable;
-    $('#titleInput').disabled = !editable;
-    $('#editToggleBtn').textContent = editable ? 'Lock Editing' : 'Unlock Editing';
-  }
-  async function promptSecure(title, placeholder){
-    const promise = showModal({title, bodyHtml:`<input id="secureInput" type="password" placeholder="${escapeHtml(placeholder)}" />`, okText:'OK', cancelText:'Cancel'});
-    await 0; $('#secureInput').focus();
-    const ok = await promise;
-    if(ok) return $('#secureInput').value;
-    return null;
+      <div style="margin-top:10px"><label style="font-size:12px">PAT (Contents: Read/Write for this repo)</label><input id="ghToken" type="text" value="${escapeHtml(cfg.token||'')}" placeholder="ghp_..."/></div>
+      <div style="margin-top:10px"><label><input id="ghAuto" type="checkbox" ${cfg.auto?'checked':''}/> Auto-sync on save</label></div>
+      <div style="margin-top:10px; display:flex; gap:8px"><button class="btn btn-ghost" id="ghTest">Test & Save</button><button class="btn btn-ghost" id="ghPush">Sync Now</button></div>`;
+    const p = showModal({title:'GitHub Sync', bodyHtml: body, okText:'Close', cancelText:'Close'});
+    await 0;
+    const collect = ()=>({
+      owner: $('#ghOwner').value.trim(),
+      repo: $('#ghRepo').value.trim(),
+      branch: $('#ghBranch').value.trim() || 'main',
+      path: $('#ghPath').value.trim() || 'notes-export.json',
+      token: $('#ghToken').value.trim(),
+      auto: $('#ghAuto').checked
+    });
+    $('#ghTest').onclick = async ()=>{
+      const ncfg = collect(); setGhCfg(ncfg);
+      const ok = await githubCommit('Test commit (dry run)', true); toast(ok?'Config OK':'Config failed');
+    };
+    $('#ghPush').onclick = async ()=>{
+      const ncfg = collect(); setGhCfg(ncfg);
+      const ok = await githubCommit('Manual sync'); toast(ok?'Synced to GitHub':'Sync failed');
+    };
+    await p;
   }
   async function githubCommit(message, dryRun=false){
     const cfg = getGhCfg();
-    if(!cfg.enabled){ return false; }
     if(!cfg.owner || !cfg.repo || !cfg.branch || !cfg.path || !cfg.token){ toast('GitHub config incomplete'); return false; }
-    const payload = {
-      version: 1,
-      exportedAt: new Date().toISOString(),
-      expanded: state.expanded,
-      nodes: await idbGetAll()
-    };
+    const payload = { version: 1, exportedAt: new Date().toISOString(), expanded: state.expanded, nodes: await idbGetAll() };
     const content = utf8ToB64(JSON.stringify(payload, null, 2));
     const base = `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${cfg.path}`;
-    const headers = {
-      'Authorization': `Bearer ${cfg.token}`,
-      'Accept': 'application/vnd.github+json'
-    };
-    // get SHA if file exists
+    const headers = { 'Authorization': `Bearer ${cfg.token}`, 'Accept': 'application/vnd.github+json' };
     let sha=null;
-    try{
-      const getRes = await fetch(`${base}?ref=${encodeURIComponent(cfg.branch)}`, { headers });
-      if(getRes.ok){
-        const info = await getRes.json();
-        sha = info.sha;
-      }
-    }catch(e){ /* ignore */ }
+    try{ const getRes = await fetch(`${base}?ref=${encodeURIComponent(cfg.branch)}`, { headers }); if(getRes.ok){ const info=await getRes.json(); sha=info.sha; } }catch{}
     if(dryRun) return true;
     try{
-      const putRes = await fetch(base, {
-        method:'PUT',
-        headers,
-        body: JSON.stringify({ message, content, branch: cfg.branch, sha: sha || undefined })
-      });
-      if(!putRes.ok){
-        console.error('GitHub PUT failed', await putRes.text());
-        return false;
-      }
+      const putRes = await fetch(base, { method:'PUT', headers, body: JSON.stringify({ message, content, branch: cfg.branch, sha: sha||undefined }) });
+      if(!putRes.ok){ console.error('GitHub PUT failed', await putRes.text()); return false; }
       return true;
-    }catch(e){
-      console.error('GitHub error', e);
-      return false;
-    }
+    }catch(e){ console.error('GitHub error', e); return false; }
+  }
+
+  // ---------- Editing Lock ----------
+  function getEditEnabled(){ return localStorage.getItem('editingEnabled') === 'true'; }
+  function setEditEnabled(v){ localStorage.setItem('editingEnabled', v ? 'true' : 'false'); updateEditability(); }
+
+  async function toggleEdit(){
+    const enabled = getEditEnabled();
+    if(enabled){ setEditEnabled(false); toast('Editing locked'); return; }
+    // unlock
+    setEditEnabled(true); toast('Editing unlocked');
+  }
+
+  function updateEditability(){
+    const editable = getEditEnabled();
+    // Toolbar + editor
+    $('#toolbar').classList.toggle('disabled', !editable);
+    $('#editor').setAttribute('contenteditable', editable ? 'true' : 'false');
+    $('#titleInput').disabled = !editable;
+    $('#addSectionBtn').disabled = !editable;
+    $('#addPageBtn').disabled = !editable;
+    // GitHub Sync button hidden when locked
+    $('#githubBtn').style.display = editable ? '' : 'none';
+    // Toggle button text
+    $('#editToggleBtn').textContent = editable ? 'Lock Editing' : 'Unlock Editing';
   }
 
   // ---------- Event wiring ----------
@@ -1302,29 +818,22 @@
 
     // Toolbar
     $('#toolbar').addEventListener('click', (e)=>{
-      const btn = e.target.closest('.tool-btn');
-      if(!btn) return;
-      const cmd = btn.dataset.cmd;
-      if(!cmd) return;
-      exec(cmd);
-      saveContentDebounced();
+      const btn = e.target.closest('.tool-btn'); if(!btn) return;
+      const cmd = btn.dataset.cmd; if(!cmd) return; exec(cmd); saveContentDebounced();
     });
     $('#headingSelect').onchange = (e)=>{ applyHeading(e.target.value); saveContentDebounced(); };
-    $('#fontSizeSelect').onchange = (e)=>{ applyFontSize(e.target.value); saveContentDebounced(); e.target.value='default'; };
-    $('#lineHeightSelect').onchange = (e)=>{ applyLineHeight(e.target.value); saveContentDebounced(); e.target.value='default'; };
+    $('#fontSizeSelect').onchange = (e)=>{ if(e.target.value!=='default'){ wrapSelectionWithSpan({ fontSize: e.target.value }); saveContentDebounced(); } e.target.value='default'; };
+    $('#lineHeightSelect').onchange = (e)=>{ if(e.target.value!=='default'){ wrapSelectionBlockStyle({ lineHeight: e.target.value }); saveContentDebounced(); } e.target.value='default'; };
     $('#colorPicker').oninput = (e)=>{ exec('foreColor', e.target.value); saveContentDebounced(); };
     $('#linkBtn').onclick = ()=> insertLinkModal();
     $('#imageBtn').onclick = ()=> $('#imageInput').click();
-    $('#imageInput').onchange = (e)=>{
-      const f = e.target.files?.[0]; if(f) insertImageFile(f);
-      e.target.value='';
-    };
+    $('#imageInput').onchange = (e)=>{ const f=e.target.files?.[0]; if(f) insertImageFile(f); e.target.value=''; };
     $('#formulaBtn').onclick = ()=> insertFormula();
-    $('#clearFormatBtn').onclick = ()=> clearFormatting();
+    $('#clearFormatBtn').onclick = ()=> clearAllContent();
 
     // Title / content save
     $('#titleInput').addEventListener('input', saveContentDebounced);
-    editor.addEventListener('input', ()=>{ saveContentDebounced(); });
+    editor.addEventListener('input', ()=> saveContentDebounced());
 
     // Add buttons
     $('#addSectionBtn').onclick = addSection;
@@ -1334,46 +843,24 @@
       if(sel?.type==='section') parentId = sel.id;
       else {
         const sections = state.nodes.filter(n=>n.type==='section');
-        if(sections.length===0){
-          await addSection();
-          parentId = state.nodes.filter(n=>n.type==='section').slice(-1)[0]?.id;
-        }else{
-          const options = sections.map(s=>`<option value="${s.id}">${escapeHtml(s.title)}</option>`).join('');
-          const promise = showModal({title:'Add Page', bodyHtml:`
-            <label for="sectionSelect" style="display:block; font-size:13px; color:#374151; margin-bottom:6px;">Choose a section</label>
-            <select id="sectionSelect" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px">
-              ${options}
-            </select>
-          `, okText:'Next', cancelText:'Cancel'});
-          await 0;
-          parentId = $('#sectionSelect').value;
-          const ok = await promise;
-          if(!ok) return;
+        if(sections.length===0){ await addSection(); parentId = state.nodes.filter(n=>n.type==='section').slice(-1)[0]?.id; }
+        else{
+          const options = state.nodes.filter(n=>n.type==='section').map(s=>`<option value="${s.id}">${escapeHtml(s.title)}</option>`).join('');
+          const p = showModal({title:'Add Page', bodyHtml:`<label style="display:block; font-size:13px; color:#374151; margin-bottom:6px;">Choose a section</label><select id="sectionSelect" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px">${options}</select>`, okText:'Next', cancelText:'Cancel'});
+          await 0; parentId = $('#sectionSelect').value; const ok = await p; if(!ok) return;
         }
       }
       await addPage(parentId);
     };
 
     // Search filter + open results on Enter
-    $('#search').addEventListener('input', (e)=>{
-      state.filter = e.target.value;
-      renderTree();
-    });
-    $('#search').addEventListener('keydown', (e)=>{
-      if(e.key==='Enter'){
-        e.preventDefault();
-        openSearchResults($('#search').value);
-      }
-    });
+    $('#search').addEventListener('input', (e)=>{ state.filter = e.target.value; renderTree(); });
+    $('#search').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); openSearchResults($('#search').value); } });
 
     // Export/Import
     $('#exportBtn').onclick = exportAll;
     $('#importBtn').onclick = ()=> $('#importFile').click();
-    $('#importFile').onchange = (e)=>{
-      const file = e.target.files?.[0];
-      if(file) importAll(file);
-      e.target.value='';
-    };
+    $('#importFile').onchange = (e)=>{ const f=e.target.files?.[0]; if(f) importAll(f); e.target.value=''; };
 
     // GitHub Sync
     $('#githubBtn').onclick = ()=> ghConfigModal();
@@ -1387,7 +874,8 @@
       if((e.metaKey || e.ctrlKey) && e.key.toLowerCase()==='k'){ e.preventDefault(); insertLinkModal(); }
     });
 
-    updateEditability();
+    // Start locked by default unless previously unlocked
+    if(localStorage.getItem('editingEnabled')===null){ setEditEnabled(false); } else { updateEditability(); }
   }
 
   // ---------- Kickoff ----------
