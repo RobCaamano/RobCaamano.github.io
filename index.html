@@ -155,6 +155,7 @@
       cursor:pointer;
     }
     .tool-btn:hover{background:#f3f4f6}
+    .tool-btn.active{background:#e5e7eb}
     .tool-sep{width:1px; height:28px; background:var(--border); margin:0 2px}
     .editor-wrap{
       position:relative;
@@ -180,6 +181,7 @@
     }
     #editor[contenteditable="false"]{background:#fafafa}
     #editor img{max-width:100%; height:auto; display:block; margin:8px 0}
+    mjx-container[contenteditable="false"]{user-select:text}
     .placeholder{color:#9ca3af}
     .empty-hint{
       padding:24px; color:#374151;
@@ -417,6 +419,14 @@
       req.onerror = ()=> rej(req.error);
     });
   }
+  async function idbClear(){
+    const [t, s] = tx(STORE, 'readwrite');
+    return new Promise((res, rej)=>{
+      const req = s.clear();
+      req.onsuccess = ()=> res();
+      req.onerror = ()=> rej(req.error);
+    });
+  }
 
   // ---------- Data Model ----------
   // Node: { id, type: 'home'|'section'|'page', title, contentHtml?, parentId?, order? }
@@ -433,7 +443,7 @@
       const home = {
         id:'home', type:'home', title:'Home',
         contentHtml: `<h1>Welcome</h1>
-<p>This is your docs-style notes space. Use the green sidebar to add sections and pages. Everything is saved locally in your browser (IndexedDB). Use Export to back up. Optional: configure GitHub Sync to commit your notes JSON to a private repo. Editing is read-only for others by default.</p>`
+<p>This is your docs-style notes space. Use the green sidebar to add sections and pages. Everything is saved locally in your browser (IndexedDB). If configured, GitHub Sync keeps your <code>notes-export.json</code> in this repo up to date so every viewer sees the same content.</p>`
       };
       state.nodes.push(home);
       await idbPut(home);
@@ -571,7 +581,10 @@
       $('#editor').style.display='block';
       $('#titleInput').value = node.title || '';
       $('#editor').innerHTML = node.contentHtml || '';
-      MathJax?.typesetPromise?.([$('#editor')]).then(()=>ensureCaretOutsideMath());
+      MathJax?.typesetPromise?.([$('#editor')]).then(()=>{
+        hardenMathJax();
+        ensureCaretOutsideMath();
+      });
     }
     renderTree();
     updateEditability();
@@ -640,11 +653,21 @@
   const saveIndicator = $('#saveIndicator');
 
   let lastRange = null;
+
+  function selectionInsideEditor(){
+    const sel = window.getSelection();
+    if(!sel || sel.rangeCount===0) return false;
+    const r = sel.getRangeAt(0);
+    return editor.contains(r.startContainer) && editor.contains(r.endContainer);
+  }
+
   function saveSelection(){
     const sel = window.getSelection();
     if(!sel || sel.rangeCount===0) return;
     const r = sel.getRangeAt(0);
-    if(editor.contains(r.startContainer)) lastRange = r.cloneRange();
+    if(editor.contains(r.startContainer)){
+      lastRange = r.cloneRange();
+    }
   }
   function restoreSelection(){
     if(lastRange){
@@ -672,17 +695,16 @@
     saveSelection();
   }
   function nearestBlock(node){
-    if(node.nodeType===3) node = node.parentElement;
-    return node.closest('p,div,li,h1,h2,h3,h4,h5,h6,pre,blockquote') || editor;
+    if(node && node.nodeType===3) node = node.parentElement;
+    return node?.closest('p,div,li,h1,h2,h3,h4,h5,h6,pre,blockquote') || editor;
   }
   function ensureCaretOutsideMath(){
     const sel = window.getSelection();
-    if(!sel.rangeCount) return;
+    if(!sel || !sel.rangeCount) return;
     let anchor = sel.anchorNode;
     if(anchor && anchor.nodeType===3) anchor = anchor.parentElement;
     const mjx = anchor?.closest ? anchor.closest('mjx-container') : null;
     if(mjx){
-      // add single space node AFTER the mjx's parent wrapper (often the same as mjx.parentNode)
       const parent = mjx.parentNode;
       const next = mjx.nextSibling;
       if(!(next && next.nodeType===3 && /^\s$/.test(next.nodeValue))){
@@ -692,19 +714,59 @@
       placeCaretAfter(mjx.nextSibling || mjx);
     }
   }
+  function hardenMathJax(){
+    // Make math uneditable to avoid weird cursor/selection behavior
+    editor.querySelectorAll('mjx-container').forEach(m=>{
+      m.setAttribute('contenteditable','false');
+      m.setAttribute('draggable','false');
+    });
+  }
+
+  // Keep selection updated even when user clicks around
+  document.addEventListener('selectionchange', ()=>{
+    if(selectionInsideEditor()){
+      saveSelection();
+      updateActiveFormatting();
+    }
+  });
+
   editor.addEventListener('keyup', saveSelection);
   editor.addEventListener('mouseup', saveSelection);
   editor.addEventListener('focus', saveSelection);
 
-  function exec(cmd, val=null){ document.execCommand(cmd, false, val); editor.focus(); saveSelection(); }
+  function exec(cmd, val=null){
+    document.execCommand(cmd, false, val);
+    editor.focus();
+    saveSelection();
+    updateActiveFormatting();
+  }
 
   function applyHeading(tag){
     if(tag==='p'){ document.execCommand('formatBlock', false, 'p'); }
     else document.execCommand('formatBlock', false, tag);
   }
+
+  function selectionIntersectsMath(){
+    const sel = window.getSelection();
+    if(!sel || sel.rangeCount===0) return false;
+    const range = sel.getRangeAt(0);
+    const mathNodes = editor.querySelectorAll('mjx-container');
+    for(const m of mathNodes){
+      try{
+        if(range.intersectsNode(m)) return true;
+      }catch(_e){/* ignore */}
+    }
+    return false;
+  }
+
   function applyFontSize(size){
     if(size==='default') return;
-    wrapSelectionWithSpan({ fontSize: size });
+    if(selectionIntersectsMath()){
+      // Apply to block to avoid wrapping math nodes
+      wrapSelectionBlockStyle({ fontSize: size });
+    }else{
+      wrapSelectionWithSpan({ fontSize: size });
+    }
   }
   function applyLineHeight(lh){
     if(lh==='default') return;
@@ -734,10 +796,24 @@
     const sel = window.getSelection();
     if(!sel.rangeCount) return;
     let node = sel.anchorNode;
-    if(node.nodeType===3) node = node.parentElement;
+    if(node && node.nodeType===3) node = node.parentElement;
     const block = nearestBlock(node);
     Object.assign(block.style, styleObj);
     saveSelection();
+  }
+
+  function updateActiveFormatting(){
+    const map = {
+      bold: document.queryCommandState('bold'),
+      italic: document.queryCommandState('italic'),
+      underline: document.queryCommandState('underline')
+    };
+    $$('.tool-btn[data-cmd]').forEach(btn=>{
+      const cmd = btn.dataset.cmd;
+      if(map.hasOwnProperty(cmd)){
+        btn.classList.toggle('active', !!map[cmd]);
+      }
+    });
   }
 
   // Custom Link modal
@@ -762,7 +838,7 @@
         restoreSelection();
         document.execCommand('createLink', false, url);
         if(text && text !== selectedText){
-          const a = window.getSelection().anchorNode.parentElement.closest('a');
+          const a = window.getSelection().anchorNode?.parentElement?.closest('a');
           if(a){ a.textContent = text; }
         }
       }else{
@@ -825,13 +901,45 @@
     }
   });
 
+  // --- Caret marker helpers (robust insertion at cursor) ---
+  function insertCaretMarker(){
+    // Ensure there is always a stable DOM anchor even if selection is lost
+    restoreSelection();
+    const id = 'caret-marker-' + Date.now();
+    const marker = document.createElement('span');
+    marker.id = id;
+    marker.style.display = 'inline-block';
+    marker.style.width = '0';
+    marker.style.height = '0';
+    marker.style.lineHeight = '0';
+    const sel = window.getSelection();
+    if(sel && sel.rangeCount){
+      const range = sel.getRangeAt(0).cloneRange();
+      range.collapse(false);
+      range.insertNode(marker);
+      // keep caret after marker for visual continuity
+      placeCaretAfter(marker);
+    }else{
+      editor.appendChild(marker);
+    }
+    return id;
+  }
+  function consumeCaretMarker(id){
+    const marker = document.getElementById(id);
+    return marker || null;
+  }
+
   // Insert Formula (LaTeX) via modal
   async function insertFormula(){
-    saveSelection();
+    // drop a marker so we always insert at the user's caret, not at start
+    const markerId = insertCaretMarker();
     const latex = await promptModal('Insert Formula', 'Enter LaTeX (inline with $...$ or display with $$...$$)', '');
-    if(latex===null || latex.trim()==='') return;
-    editor.focus();
-    restoreSelection();
+    if(latex===null || latex.trim()===''){
+      // remove marker and bail
+      const m0 = consumeCaretMarker(markerId);
+      if(m0) m0.remove();
+      return;
+    }
     const span = document.createElement('span');
     const content = latex.trim();
     if(content.startsWith('$$') || content.startsWith('\\[') || content.startsWith('\\(') || content.startsWith('$')){
@@ -839,16 +947,33 @@
     }else{
       span.textContent = '$' + content + '$';
     }
-    const range = window.getSelection().getRangeAt(0);
-    range.collapse(false);
-    range.insertNode(span);
-    // always add a spacer and move caret outside
-    let spacer = document.createTextNode(' ');
-    span.parentNode.insertBefore(spacer, span.nextSibling);
-    placeCaretAfter(spacer);
-    MathJax?.typesetPromise?.([span]).then(()=>ensureCaretOutsideMath());
+    // Find marker and insert formula right there
+    const m = consumeCaretMarker(markerId);
+    if(m && m.parentNode){
+      m.parentNode.insertBefore(span, m);
+      // always add a spacer and move caret outside
+      const spacer = document.createTextNode(' ');
+      m.parentNode.insertBefore(spacer, m.nextSibling);
+      placeCaretAfter(spacer);
+      m.remove();
+    }else{
+      // fallback: restore selection and insert
+      editor.focus();
+      restoreSelection();
+      const range = window.getSelection().getRangeAt(0);
+      range.collapse(false);
+      range.insertNode(span);
+      const spacer = document.createTextNode(' ');
+      span.parentNode.insertBefore(spacer, span.nextSibling);
+      placeCaretAfter(spacer);
+    }
+    MathJax?.typesetPromise?.([span]).then(()=>{
+      hardenMathJax();
+      ensureCaretOutsideMath();
+    });
     saveContentDebounced();
   }
+
   // Clear ALL content in the editor
   async function clearEditorAll(){
     const ok = await confirmModal('Clear page', 'Clear ALL content in the editor? This cannot be undone.');
@@ -858,7 +983,6 @@
     saveContentDebounced();
     editor.focus();
   }
-
 
   // Clear formatting (selection or current block) without adding newlines
   function cleanElement(root){
@@ -887,7 +1011,6 @@
       // operate on current block
       const block = nearestBlock(range.startContainer);
       if(block && editor.contains(block)){
-        // clone, clean, replace
         const shadow = block.cloneNode(true);
         cleanElement(shadow);
         block.replaceWith(shadow);
@@ -907,10 +1030,7 @@
     const nodes = Array.from(temp.childNodes);
     nodes.forEach(n=> cleanedFrag.appendChild(n));
     range.deleteContents();
-    const insertAt = range.startContainer;
-    const inserted = cleanedFrag.cloneNode(true);
     range.insertNode(cleanedFrag);
-    // position caret after last inserted node
     const last = nodes[nodes.length-1];
     if(last && last.parentNode){ placeCaretAfter(last); }
     saveContentDebounced();
@@ -936,7 +1056,10 @@
 
   // Auto-render LaTeX after boundary chars; then force caret outside math
   const typesetDebounced = debounce(()=>{
-    MathJax?.typesetPromise?.([editor]).then(()=>ensureCaretOutsideMath());
+    MathJax?.typesetPromise?.([editor]).then(()=>{
+      hardenMathJax();
+      ensureCaretOutsideMath();
+    });
   }, 250);
   editor.addEventListener('input', (e)=>{
     saveContentDebounced();
@@ -987,6 +1110,9 @@
       version: 1,
       exportedAt: new Date().toISOString(),
       expanded: state.expanded,
+      meta: {
+        editPinHash: localStorage.getItem('editPinHash') || null
+      },
       nodes
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
@@ -1003,14 +1129,11 @@
     let data;
     try{ data = JSON.parse(text); } catch(e){ toast('Invalid JSON'); return; }
     if(!data?.nodes || !Array.isArray(data.nodes)){ toast('Invalid export file'); return; }
-    const existing = await idbGetAll();
-    const map = new Map(existing.map(n=>[n.id, n]));
-    for(const n of data.nodes){
-      map.set(n.id, n);
-      await idbPut(n);
-    }
-    state.nodes = Array.from(map.values());
+    await idbClear();
+    for(const n of data.nodes){ await idbPut(n); }
+    state.nodes = await idbGetAll();
     if(Array.isArray(data.expanded)) { state.expanded = data.expanded; persistExpanded(); }
+    if(data.meta?.editPinHash){ localStorage.setItem('editPinHash', data.meta.editPinHash); }
     renderTree();
     selectNode('home');
     toast('Imported');
@@ -1160,7 +1283,7 @@
         <button class="btn btn-ghost" id="ghPush">Sync Now</button>
       </div>
       <hr style="margin:16px 0">
-      <p style="font-size:13px; color:#374151; margin-top:0"><strong>Owner Edit PIN</strong> (optional soft lock to keep UI read-only for others)</p>
+      <p style="font-size:13px; color:#374151; margin-top:0"><strong>Owner Edit PIN</strong> (store hash in JSON so others cannot set their own)</p>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
         <div>
           <label style="font-size:12px">Set/Change PIN</label>
@@ -1205,46 +1328,42 @@
         if(!p1 || p1!==p2){ toast('PIN mismatch'); return; }
         const hash = await sha256(p1);
         localStorage.setItem('editPinHash', hash);
-        toast('PIN saved');
+        // commit immediately so viewers inherit the same lock
+        const ok = await githubCommit('Update owner PIN (hash in JSON)');
+        toast(ok ? 'PIN saved & synced' : 'PIN saved locally');
       };
     })();
     return promise;
   }
+
   function getEditEnabled(){ return localStorage.getItem('editingEnabled')==='true'; }
   function setEditEnabled(v){ localStorage.setItem('editingEnabled', v ? 'true' : 'false'); updateEditability(); }
+
   async function toggleEdit(){
-    const pinHash = localStorage.getItem('editPinHash');
     const enabled = getEditEnabled();
     if(enabled){
       setEditEnabled(false);
       toast('Editing locked');
       return;
     }
+    // Require an existing PIN; do NOT allow anyone to create one from locked state
+    const pinHash = localStorage.getItem('editPinHash');
     if(!pinHash){
-      const p1 = await promptSecure('Set Owner PIN', 'Enter new PIN');
-      if(!p1) return;
-      const p2 = await promptSecure('Confirm PIN', 'Re-enter PIN');
-      if(p1!==p2){ toast('PIN mismatch'); return; }
-      const hash = await sha256(p1);
-      localStorage.setItem('editPinHash', hash);
+      toast('Owner PIN not set. Ask the owner to set it via GitHub Sync.');
+      return;
+    }
+    const p = await promptSecure('Unlock Editing', 'Enter PIN to unlock');
+    if(!p) return;
+    const hash = await sha256(p);
+    if(hash===pinHash){
       setEditEnabled(true);
       toast('Editing unlocked');
-      return;
     }else{
-      const p = await promptSecure('Unlock Editing', 'Enter PIN to unlock');
-      if(!p) return;
-      const hash = await sha256(p);
-      if(hash===pinHash){
-        setEditEnabled(true);
-        toast('Editing unlocked');
-      }else{
-        toast('Incorrect PIN');
-      }
+      toast('Incorrect PIN');
     }
   }
+
   function updateEditability(){
-    const cfg = getGhCfg();
-    // Lock state is authoritative. Token no longer bypasses a lock.
     const editable = getEditEnabled();
     $('#toolbar').classList.toggle('disabled', !editable);
     $('#editor').setAttribute('contenteditable', editable ? 'true' : 'false');
@@ -1253,10 +1372,11 @@
     $('#titleInput').disabled = !editable;
     // Button label reflects actual state
     $('#editToggleBtn').textContent = editable ? 'Lock Editing' : 'Unlock Editing';
-    // GitHub Sync hidden when locked; visible when unlocked so you can configure/push
+    // GitHub Sync hidden when locked
     const ghBtn = $('#githubBtn');
     if(ghBtn) ghBtn.style.display = editable ? 'inline-block' : 'none';
   }
+
   async function promptSecure(title, placeholder){
     const promise = showModal({title, bodyHtml:`<input id="secureInput" type="password" placeholder="${escapeHtml(placeholder)}" />`, okText:'OK', cancelText:'Cancel'});
     await 0; $('#secureInput').focus();
@@ -1264,6 +1384,7 @@
     if(ok) return $('#secureInput').value;
     return null;
   }
+
   async function githubCommit(message, dryRun=false){
     const cfg = getGhCfg();
     if(!cfg.enabled){ return false; }
@@ -1272,6 +1393,9 @@
       version: 1,
       exportedAt: new Date().toISOString(),
       expanded: state.expanded,
+      meta: {
+        editPinHash: localStorage.getItem('editPinHash') || null
+      },
       nodes: await idbGetAll()
     };
     const content = utf8ToB64(JSON.stringify(payload, null, 2));
@@ -1307,6 +1431,27 @@
     }
   }
 
+  // ---------- Always load from repo copy when available ----------
+  async function loadFromRemoteNotesIfAvailable({silent=false}={}){
+    try{
+      const url = `${location.origin}/notes-export.json?cache=${Date.now()}`;
+      const res = await fetch(url, { cache:'no-store' });
+      if(!res.ok) return;
+      const data = await res.json();
+      if(!Array.isArray(data?.nodes)) return;
+      await idbClear();
+      for(const n of data.nodes){ await idbPut(n); }
+      state.nodes = await idbGetAll();
+      if(Array.isArray(data.expanded)){ state.expanded = data.expanded; persistExpanded(); }
+      if(data.meta?.editPinHash){ localStorage.setItem('editPinHash', data.meta.editPinHash); }
+      renderTree();
+      selectNode(state.selectedId || 'home');
+      if(!silent) toast('Loaded latest notes from repo');
+    }catch(e){
+      if(!silent) console.warn('Remote notes load failed', e);
+    }
+  }
+
   // ---------- Event wiring ----------
   async function init(){
     db = await idbOpen();
@@ -1314,6 +1459,16 @@
     await ensureHome();
     renderTree();
     selectNode(state.selectedId);
+
+    // Try to hydrate from the repo's JSON so every viewer sees the same content
+    loadFromRemoteNotesIfAvailable({silent:true});
+
+    // Re-hydrate when tab becomes visible (pull latest)
+    document.addEventListener('visibilitychange', ()=>{
+      if(document.visibilityState === 'visible'){
+        loadFromRemoteNotesIfAvailable({silent:true});
+      }
+    });
 
     // Toolbar
     $('#toolbar').addEventListener('click', (e)=>{
@@ -1335,7 +1490,7 @@
       e.target.value='';
     };
     $('#formulaBtn').onclick = ()=> insertFormula();
-    // Preserve caret when clicking toolbar buttons
+    // Preserve caret when clicking toolbar buttons (prevents focus loss)
     $('#toolbar').addEventListener('mousedown', (e)=>{
       if (e.target.closest('.tool-btn') || e.target.id === 'colorPicker') {
         e.preventDefault();
