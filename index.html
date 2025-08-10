@@ -213,11 +213,34 @@
     .btn-ghost{background:#fff; color:#111; border:1px solid var(--border)}
     .btn-primary{background:#111827; color:#fff; border:1px solid #111827}
     .danger{color:#fff; background:var(--danger); border-color:var(--danger)}
+
     /* Search results styling */
     .result{padding:10px 0; border-bottom:1px solid var(--border)}
     .result .where{font-size:12px; color:#6b7280}
     .result .snippet{font-size:14px; margin-top:6px}
     mark{background:#fff59d}
+
+    /* Image selection */
+    #editor img.img-selected{
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+    .img-toolbar{
+      position:absolute;
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:6px;
+      padding:6px;
+      display:none;
+      gap:8px;
+      align-items:center;
+      box-shadow:0 8px 24px rgba(0,0,0,.12);
+      z-index:1000;
+    }
+    .img-toolbar input[type="range"]{ width:160px; }
+    .img-toolbar .btn{ color:#111; background:#f9fafb; border-color:var(--border); }
+    .img-toolbar .btn:hover{ background:#f3f4f6; }
+
     /* Responsive */
     @media (max-width: 880px){
       .app{grid-template-columns: 220px 1fr;}
@@ -328,6 +351,15 @@
       <div class="empty-hint" id="emptyHint" style="display:none">
         <h3>This is a section</h3>
         <p>Sections hold pages. Use <strong>+ Page</strong> to add notes.</p>
+      </div>
+
+      <!-- Floating image toolbar -->
+      <div id="imgToolbar" class="img-toolbar">
+        <label style="font-size:12px">Width</label>
+        <input id="imgWidth" type="range" min="60" max="1200" step="10">
+        <button id="imgLeft" class="btn">⬅</button>
+        <button id="imgRight" class="btn">➡</button>
+        <button id="imgDelete" class="btn danger">Delete</button>
       </div>
     </div>
   </main>
@@ -443,7 +475,8 @@
       const home = {
         id:'home', type:'home', title:'Home',
         contentHtml: `<h1>Welcome</h1>
-<p>This is your docs-style notes space. Use the green sidebar to add sections and pages. Everything is saved locally in your browser (IndexedDB). If configured, GitHub Sync keeps your <code>notes-export.json</code> in this repo up to date so every viewer sees the same content.</p>`
+<p>This is your docs-style notes space. Use the green sidebar to add sections and pages. Everything is saved locally in your browser (IndexedDB). If configured, GitHub Sync keeps your <code>notes-export.json</code> in this repo up to date so every viewer sees the same content.</p>
+<p style="font-size:12px;color:#6b7280"><em>Owner PIN storage:</em> we store a SHA‑256 hash in <code>localStorage.editPinHash</code> on this device and also in <code>notes-export.json → meta.editPinHash</code> in your GitHub repo so all viewers inherit the same lock. No plaintext PIN is stored.</p>`
       };
       state.nodes.push(home);
       await idbPut(home);
@@ -569,10 +602,11 @@
     }
   }
 
-  function escapeHtml(s){ return s.replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
+  function escapeHtml(s){ return (s||'').replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
 
   async function selectNode(id){
     state.selectedId = id;
+    localStorage.setItem('selectedId', id); // persist current page across refreshes
     const node = state.nodes.find(n=>n.id===id);
     $('#crumb').textContent = node?.title || 'Untitled';
     if(node){
@@ -759,8 +793,37 @@
     return false;
   }
 
+  function selectionLooksLikeSelectAll(){
+    const sel = window.getSelection();
+    if(!sel || !sel.rangeCount) return false;
+    const range = sel.getRangeAt(0);
+    // Heuristic: if common ancestor is editor and it spans from start to end
+    if(range.commonAncestorContainer === editor){
+      if(range.startOffset === 0 && range.endOffset === editor.childNodes.length) return true;
+    }
+    // Fallback: if selection covers >90% of text length
+    const text = textFromHtml(editor.innerHTML);
+    const temp = document.createElement('div');
+    temp.appendChild(range.cloneContents());
+    const selText = temp.textContent || '';
+    return selText.length >= Math.max(1, text.length * 0.9);
+  }
+
   function applyFontSize(size){
     if(size==='default') return;
+    const sel = window.getSelection();
+    if(!sel || !sel.rangeCount){
+      wrapSelectionBlockStyle({ fontSize: size });
+      return;
+    }
+    if(selectionLooksLikeSelectAll()){
+      // Apply to all block elements for Ctrl+A robustness
+      editor.querySelectorAll('p,li,div,h1,h2,h3,h4,h5,h6,pre,blockquote').forEach(el=>{
+        el.style.fontSize = size;
+      });
+      saveSelection();
+      return;
+    }
     if(selectionIntersectsMath()){
       // Apply to block to avoid wrapping math nodes
       wrapSelectionBlockStyle({ fontSize: size });
@@ -770,6 +833,13 @@
   }
   function applyLineHeight(lh){
     if(lh==='default') return;
+    if(selectionLooksLikeSelectAll()){
+      editor.querySelectorAll('p,li,div,h1,h2,h3,h4,h5,h6,pre,blockquote').forEach(el=>{
+        el.style.lineHeight = lh;
+      });
+      saveSelection();
+      return;
+    }
     wrapSelectionBlockStyle({ lineHeight: lh });
   }
   function wrapSelectionWithSpan(styleObj){
@@ -860,12 +930,17 @@
   }
 
   // Insert Image via file input or drag-drop
+  function ensureImgId(img){
+    if(!img.dataset.imgId){ img.dataset.imgId = 'img-' + uuid(); }
+  }
   function insertImageFile(file){
     const reader = new FileReader();
     reader.onload = () => {
       const img = document.createElement('img');
       img.src = reader.result;
       img.alt = file.name || 'image';
+      img.draggable = true;
+      ensureImgId(img);
       restoreSelection();
       const range = window.getSelection().getRangeAt(0);
       range.collapse(false);
@@ -876,19 +951,127 @@
     reader.readAsDataURL(file);
   }
 
-  // Drag & Drop
+  // Drag & Drop file/image OR move existing image
   editor.addEventListener('dragover', (e)=>{
     e.preventDefault();
   });
+  function rangeFromPoint(x, y){
+    if(document.caretRangeFromPoint){
+      return document.caretRangeFromPoint(x, y);
+    }else if(document.caretPositionFromPoint){
+      const pos = document.caretPositionFromPoint(x, y);
+      if(pos){
+        const r = document.createRange();
+        r.setStart(pos.offsetNode, pos.offset);
+        r.collapse(true);
+        return r;
+      }
+    }
+    return null;
+  }
   editor.addEventListener('drop', (e)=>{
     e.preventDefault();
-    const files = e.dataTransfer.files;
+    const dt = e.dataTransfer;
+    // Move existing image
+    const payload = dt.getData('text/plain') || '';
+    if(payload.startsWith('IMG_MOVE:')){
+      const id = payload.replace('IMG_MOVE:', '');
+      const img = editor.querySelector(`img[data-img-id="${CSS.escape(id)}"]`);
+      if(img){
+        const range = rangeFromPoint(e.clientX, e.clientY);
+        if(range){
+          // Insert a placeholder text node to anchor position
+          const marker = document.createTextNode('\u200b');
+          range.insertNode(marker);
+          img.parentNode?.removeChild(img);
+          marker.parentNode?.insertBefore(img, marker);
+          marker.parentNode?.removeChild(marker);
+          placeCaretAfter(img);
+          saveContentDebounced();
+        }
+      }
+      return;
+    }
+    // File(s)
+    const files = dt.files;
     if(files && files.length){
       for(const f of files){
         if(f.type.startsWith('image/')) insertImageFile(f);
       }
+      return;
     }
   });
+  editor.addEventListener('dragstart', (e)=>{
+    const img = e.target.closest && e.target.closest('img');
+    if(img && editor.contains(img)){
+      ensureImgId(img);
+      e.dataTransfer.setData('text/plain', 'IMG_MOVE:' + img.dataset.imgId);
+      e.dataTransfer.effectAllowed = 'move';
+    }
+  });
+
+  // Click-to-select image and show floating toolbar (resize + move helpers)
+  const imgToolbar = $('#imgToolbar');
+  const imgWidth = $('#imgWidth');
+  const imgLeft = $('#imgLeft');
+  const imgRight = $('#imgRight');
+  const imgDelete = $('#imgDelete');
+
+  function getSelectedImage(){
+    return editor.querySelector('img.img-selected');
+  }
+  function positionImgToolbar(img){
+    if(!img) { imgToolbar.style.display='none'; return; }
+    const rect = img.getBoundingClientRect();
+    const ew = $('.editor-wrap').getBoundingClientRect();
+    imgToolbar.style.display = 'flex';
+    imgToolbar.style.top = (rect.top - ew.top - imgToolbar.offsetHeight - 8 + $('.editor-wrap').scrollTop) + 'px';
+    imgToolbar.style.left = (Math.max(0, rect.left - ew.left) + 8 + $('.editor-wrap').scrollLeft) + 'px';
+  }
+  function selectImage(img){
+    $$('#editor img.img-selected').forEach(i=> i.classList.remove('img-selected'));
+    if(img){
+      img.classList.add('img-selected');
+      positionImgToolbar(img);
+      imgWidth.value = Math.round(img.getBoundingClientRect().width);
+    }else{
+      imgToolbar.style.display='none';
+    }
+  }
+  editor.addEventListener('click', (e)=>{
+    const img = e.target.closest('img');
+    if(img && editor.contains(img)){
+      selectImage(img);
+    }else{
+      selectImage(null);
+    }
+  });
+  $('.editor-wrap').addEventListener('scroll', ()=>{
+    const img = getSelectedImage();
+    if(img) positionImgToolbar(img);
+  });
+  imgWidth.addEventListener('input', ()=>{
+    const img = getSelectedImage(); if(!img) return;
+    img.style.width = imgWidth.value + 'px';
+    saveContentDebounced();
+  });
+  imgLeft.onclick = ()=>{
+    const img = getSelectedImage(); if(!img) return;
+    const block = nearestBlock(img);
+    block.parentNode?.insertBefore(block, block.previousSibling);
+    saveContentDebounced();
+  };
+  imgRight.onclick = ()=>{
+    const img = getSelectedImage(); if(!img) return;
+    const block = nearestBlock(img);
+    if(block.nextSibling) block.parentNode?.insertBefore(block.nextSibling, block);
+    saveContentDebounced();
+  };
+  imgDelete.onclick = ()=>{
+    const img = getSelectedImage(); if(!img) return;
+    img.remove(); imgToolbar.style.display='none';
+    saveContentDebounced();
+  };
 
   // Paste image support
   editor.addEventListener('paste', (e)=>{
@@ -905,13 +1088,15 @@
   function insertCaretMarker(){
     // Ensure there is always a stable DOM anchor even if selection is lost
     restoreSelection();
-    const id = 'caret-marker-' + Date.now();
+    const id = 'caret-marker-' + Date.now() + '-' + Math.floor(Math.random()*1000);
     const marker = document.createElement('span');
     marker.id = id;
     marker.style.display = 'inline-block';
     marker.style.width = '0';
     marker.style.height = '0';
     marker.style.lineHeight = '0';
+    marker.style.overflow = 'hidden';
+    marker.textContent = '\u200b';
     const sel = window.getSelection();
     if(sel && sel.rangeCount){
       const range = sel.getRangeAt(0).cloneRange();
@@ -935,7 +1120,6 @@
     const markerId = insertCaretMarker();
     const latex = await promptModal('Insert Formula', 'Enter LaTeX (inline with $...$ or display with $$...$$)', '');
     if(latex===null || latex.trim()===''){
-      // remove marker and bail
       const m0 = consumeCaretMarker(markerId);
       if(m0) m0.remove();
       return;
@@ -947,7 +1131,6 @@
     }else{
       span.textContent = '$' + content + '$';
     }
-    // Find marker and insert formula right there
     const m = consumeCaretMarker(markerId);
     if(m && m.parentNode){
       m.parentNode.insertBefore(span, m);
@@ -957,7 +1140,6 @@
       placeCaretAfter(spacer);
       m.remove();
     }else{
-      // fallback: restore selection and insert
       editor.focus();
       restoreSelection();
       const range = window.getSelection().getRangeAt(0);
@@ -1054,17 +1236,27 @@
     setTimeout(()=> s.classList.remove('show'), 900);
   }
 
-  // Auto-render LaTeX after boundary chars; then force caret outside math
-  const typesetDebounced = debounce(()=>{
+  // --- Robust MathJax typesetting with caret preservation ---
+  const scheduleTypeset = debounce(()=>{
+    const markerId = insertCaretMarker(); // remember caret before typesetting
     MathJax?.typesetPromise?.([editor]).then(()=>{
       hardenMathJax();
-      ensureCaretOutsideMath();
+      // Try to restore marker; if lost (e.g., inside math), move caret after nearest math
+      const m = document.getElementById(markerId);
+      if(m){
+        placeCaretAfter(m);
+        m.remove();
+      }else{
+        ensureCaretOutsideMath();
+      }
     });
-  }, 250);
+  }, 220);
+
   editor.addEventListener('input', (e)=>{
     saveContentDebounced();
     const ch = (e.data || '').toString();
-    if(ch && /[\s),.;:!?]/.test(ch)){ typesetDebounced(); }
+    // Trigger typeset as you finish tokens or close $$ blocks
+    if(ch && /[\s),.;:!?$]/.test(ch)){ scheduleTypeset(); }
   });
 
   // ---------- Modal helpers ----------
@@ -1111,6 +1303,8 @@
       exportedAt: new Date().toISOString(),
       expanded: state.expanded,
       meta: {
+        // PIN storage detail: the SHA-256 hash of the owner's PIN is stored here as well
+        // so that all viewers use the same lock.
         editPinHash: localStorage.getItem('editPinHash') || null
       },
       nodes
@@ -1135,7 +1329,7 @@
     if(Array.isArray(data.expanded)) { state.expanded = data.expanded; persistExpanded(); }
     if(data.meta?.editPinHash){ localStorage.setItem('editPinHash', data.meta.editPinHash); }
     renderTree();
-    selectNode('home');
+    selectNode(localStorage.getItem('selectedId') || 'home');
     toast('Imported');
   }
 
@@ -1283,7 +1477,10 @@
         <button class="btn btn-ghost" id="ghPush">Sync Now</button>
       </div>
       <hr style="margin:16px 0">
-      <p style="font-size:13px; color:#374151; margin-top:0"><strong>Owner Edit PIN</strong> (store hash in JSON so others cannot set their own)</p>
+      <p style="font-size:13px; color:#374151; margin-top:0"><strong>Owner Edit PIN</strong></p>
+      <p style="font-size:12px; color:#6b7280; margin-top:6px">
+        The hashed PIN is stored in <code>localStorage.editPinHash</code> on this device and committed to the repo JSON at <code>meta.editPinHash</code> so all viewers share the same lock. You cannot set a PIN while locked; only the owner with the current PIN can update it.
+      </p>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
         <div>
           <label style="font-size:12px">Set/Change PIN</label>
@@ -1407,7 +1604,7 @@
     // get SHA if file exists
     let sha=null;
     try{
-      const getRes = await fetch(`${base}?ref=${encodeURIComponent(cfg.branch)}`, { headers });
+      const getRes = await fetch(`${base}?ref=${encodeURIComponent(cfg.branch)}`, { headers, cache:'no-store' });
       if(getRes.ok){
         const info = await getRes.json();
         sha = info.sha;
@@ -1439,29 +1636,40 @@
       if(!res.ok) return;
       const data = await res.json();
       if(!Array.isArray(data?.nodes)) return;
+      const currentSelected = localStorage.getItem('selectedId') || state.selectedId || 'home';
       await idbClear();
       for(const n of data.nodes){ await idbPut(n); }
       state.nodes = await idbGetAll();
       if(Array.isArray(data.expanded)){ state.expanded = data.expanded; persistExpanded(); }
       if(data.meta?.editPinHash){ localStorage.setItem('editPinHash', data.meta.editPinHash); }
       renderTree();
-      selectNode(state.selectedId || 'home');
+      selectNode(currentSelected);
       if(!silent) toast('Loaded latest notes from repo');
     }catch(e){
       if(!silent) console.warn('Remote notes load failed', e);
     }
   }
 
+  // Periodic fetch when NOT editing, to keep viewers in sync with GitHub
+  setInterval(()=>{
+    if(!getEditEnabled()){ loadFromRemoteNotesIfAvailable({silent:true}); }
+  }, 60000); // every 60s
+
   // ---------- Event wiring ----------
   async function init(){
     db = await idbOpen();
     state.nodes = await idbGetAll();
     await ensureHome();
-    renderTree();
-    selectNode(state.selectedId);
 
-    // Try to hydrate from the repo's JSON so every viewer sees the same content
-    loadFromRemoteNotesIfAvailable({silent:true});
+    // Restore last selected page (kept across refresh)
+    const savedSelected = localStorage.getItem('selectedId') || 'home';
+    state.selectedId = savedSelected;
+
+    // First, try to hydrate from the repo's JSON so every viewer sees the same content
+    await loadFromRemoteNotesIfAvailable({silent:true});
+
+    renderTree();
+    await selectNode(localStorage.getItem('selectedId') || 'home');
 
     // Re-hydrate when tab becomes visible (pull latest)
     document.addEventListener('visibilitychange', ()=>{
@@ -1484,7 +1692,15 @@
     $('#lineHeightSelect').onchange = (e)=>{ applyLineHeight(e.target.value); saveContentDebounced(); e.target.value='default'; };
     $('#colorPicker').oninput = (e)=>{ exec('foreColor', e.target.value); saveContentDebounced(); };
     $('#linkBtn').onclick = ()=> insertLinkModal();
-    $('#imageBtn').onclick = ()=> $('#imageInput').click();
+    $('#imageBtn').onclick = ()=>{
+      const selectedImg = getSelectedImage();
+      if(selectedImg){
+        // Toggle toolbar positioning / do nothing; size handled in floating toolbar
+        positionImgToolbar(selectedImg);
+      }else{
+        $('#imageInput').click();
+      }
+    };
     $('#imageInput').onchange = (e)=>{
       const f = e.target.files?.[0]; if(f) insertImageFile(f);
       e.target.value='';
